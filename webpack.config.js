@@ -20,18 +20,6 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    .addEntry('js/html2pdf.bundle', './assets/js/html2pdf.bundle.js')
-    .addEntry('js/chartjs-plugin-datalabels', './node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js')
-    .addEntry('js/admin', './assets/js/admin.js')
-    .addEntry('app', './assets/app.js')
-    .addEntry('app-chartjs-plugins', './assets/app-chartjs-plugins.js')
-    .addEntry('bootstrap', './assets/bootstrap.js')
-    .addEntry('js/login', './assets/js/login.ts')
-    .addEntry('js/register', './assets/js/register.ts')
-
-    .addStyleEntry('css/admin', './assets/css/admin.scss')
-    .addStyleEntry('css/login', './assets/css/login.scss')
-    .addStyleEntry('css/index', './assets/css/index.scss')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')

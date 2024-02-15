@@ -40,3 +40,6 @@ yarn-error.log
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+###> symfony/asset-mapper ###
+/public/assets/
+###< symfony/asset-mapper ###

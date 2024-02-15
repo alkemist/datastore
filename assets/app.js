@@ -4,6 +4,7 @@
  * This file will be included onto the page via the importmap() Twig function,
  * which should already be in your base.html.twig.
  */
-import 'flex.box/src/flexbox.css';
+/*import 'flex.box/src/flexbox.css';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉')
+*/
