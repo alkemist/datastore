@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Title{% endblock %}
+
+{%- block description -%}
+    {%- if attributes['description'] is defined -%}
+        {{ attributes['description'].value }}
+    {%- endif -%}
+{%- endblock -%}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    Body
+{% endblock %}

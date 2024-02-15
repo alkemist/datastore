@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Identified{% endblock %}
+
+{%- block description -%}
+    {%- if attributes['description'] is defined -%}
+        {{ attributes['description'].value }}
+    {%- endif -%}
+{%- endblock -%}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        setTimeout(function () {
+            self.close();
+        }, 1000);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Identified</h1>
+    <div>Close in 1 second</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+body {
+}
+
+.store_fields .accordion-body .row .flex {
+  gap: 2em;
+
+  .flex-fill {
+    display: none;
+  }
+
+  & > div {
+    display: flex;
+
+    & > .form-group {
+      align-items: center;
+      width: 100%;
+    }
+
+    &:nth-child(1),
+    &:nth-child(3),
+    &:nth-child(5) {
+      flex: 1;
+    }
+
+    &:nth-child(7),
+    &:nth-child(9) {
+      width: 120px;
+    }
+
+
+    .form-control-label {
+      width: 100px;
+    }
+
+    .form-control-label + .form-widget {
+
+    }
+
+    .form-check-label {
+
+    }
+  }
+}
