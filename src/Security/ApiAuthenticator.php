@@ -40,7 +40,6 @@ class ApiAuthenticator extends AbstractAuthenticator
         //$apiToken = $request->headers->get('X-AUTH-TOKEN');
         $apiToken = $request->query->get('token'); // For dev
 
-
         if (!$apiToken) {
             throw new CustomUserMessageAuthenticationException('No API token provided');
         }

@@ -7,6 +7,8 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GoogleController extends OauthController
 {
@@ -16,13 +18,19 @@ class GoogleController extends OauthController
     /**
      * Link to this controller to start the "connect" process
      */
-    #[Route('/login/google/{origine}', name: GoogleController::ROUTE_LOGIN, requirements: ['origine' => '\w+'])]
+    #[Route('/login/google', name: GoogleController::ROUTE_LOGIN)]
     public function loginAction(
-        Request $request, ClientRegistry $clientRegistry, #[CurrentUser] ?User $user, string $origine = ''
-    ) {
+        Request $request, ClientRegistry $clientRegistry, #[CurrentUser] ?User $user
+    ): RedirectResponse {
+        $callback = $request->query->get('callback');
+
+        if(!$callback) {
+            $callback = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
         // If already logged
         if ($user && !$user->isExpired()) {
-            return $this->redirectToOrigine($origine);
+            return $this->redirectLogged($user, $callback);
         }
 
         // will redirect to Google!
@@ -33,7 +41,7 @@ class GoogleController extends OauthController
                        ], [
                            'prompt'      => 'consent', // Force to show consent & regenerate refresh token
                            'access_type' => 'offline',
-                           'state'       => $origine
+                           'state'       => $callback
                        ]);
     }
 
@@ -43,8 +51,9 @@ class GoogleController extends OauthController
      * in config/packages/knpu_oauth2_client.yaml
      */
     #[Route('/logged/google', name: GoogleController::ROUTE_LOGGED)]
-    public function loggedAction(Request $request, ClientRegistry $clientRegistry)
+    public function loggedAction(#[CurrentUser] User $user, Request $request, ClientRegistry $clientRegistry)
+    : RedirectResponse
     {
-        return $this->redirectToOrigine($request->query->get('state'));
+        return $this->redirectLogged($user, $request->query->get('state'));
     }
 }

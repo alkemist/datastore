@@ -43,7 +43,7 @@ class ApiController extends AbstractController
 
         return (new ApiResponse())
             ->setToken($user)
-            ->setItem($user->__serialize())
+            ->setItem($user->toArray())
             ->toJson();
     }
 

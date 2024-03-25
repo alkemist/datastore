@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use KnpU\OAuth2ClientBundle\Security\User\OAuthUser;
@@ -122,10 +123,28 @@ class User extends OAuthUser
         return $this->googleExpires;
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function getGoogleExpiresDiffDate(): ?DateTime
+    {
+        return $this->googleExpires > time()
+        ? DateTime::createFromFormat( 'U', $this->googleExpires - time() )
+        : null;
+    }
+
     public function setGoogleExpires(?int $googleExpires): static
     {
         $this->googleExpires = $googleExpires;
 
         return $this;
+    }
+
+    public function toArray()
+    {
+        return [
+            'uid' => $this->id,
+            'email' => $this->email
+        ];
     }
 }

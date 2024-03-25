@@ -2,8 +2,10 @@
 
 namespace App\Controller\Oauth;
 
+use App\Entity\User;
 use App\Service\OauthService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class OauthController extends AbstractController
 {
@@ -15,12 +17,8 @@ class OauthController extends AbstractController
     ) {
     }
 
-    public function redirectToOrigine(string $origine)
+    public function redirectLogged(User $user, string $callback): RedirectResponse
     {
-        if ($origine === 'api') {
-            return $this->redirectToRoute('logged');
-        }
-
-        return $this->redirectToRoute('admin');
+        return $this->redirect($callback . '?token=' . $user->getGoogleRefreshToken());
     }
 }

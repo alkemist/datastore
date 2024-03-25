@@ -8,7 +8,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -46,8 +50,13 @@ class UserCrudController extends AbstractCrudController
             ->setColumns(3);
         yield ArrayField::new('roles')
             ->setColumns(3);
+        yield TimeField::new('googleExpiresDiffDate')
+            ->setColumns(3)->setLabel('Token expire');
 
         if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_DETAIL === $pageName) {
+            yield TextField::new('googleRefreshToken')
+                ->setColumns(12);
+
             yield TextField::new('googleId')
                 ->setColumns(4);
         }

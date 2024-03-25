@@ -1,0 +1,22 @@
+nelmio_cors:
+  defaults:
+    origin_regex: true
+    allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE' ]
+    allow_headers: [ '*' ]
+    expose_headers: [ 'Link' ]
+    forced_allow_origin_value: ~
+    skip_same_as_origin: true
+    max_age: 3600
+  paths:
+    '^/token':
+      allow_origin: [ '*' ]
+      allow_headers: [ '*' ]
+      allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE' ]
+      forced_allow_origin_value: ~
+      max_age: 3600
+    '^/api/':
+      allow_origin: [ '*' ]
+      allow_headers: [ '*' ]
+      allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE' ]
+      forced_allow_origin_value: ~
+      max_age: 3600

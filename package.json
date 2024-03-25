@@ -28,7 +28,7 @@
   "dependencies": {
     "@babel/core": "^7.20.12",
     "@babel/preset-env": "^7.22.6",
-    "@simplewebauthn/browser": "^7.4.0",
+    "@simplewebauthn/browser": "^8.0.0",
     "@web-auth/webauthn-helper": "^0.0.13",
     "chartjs-plugin-datalabels": "^2.0.0",
     "typescript": "^5.1.6",

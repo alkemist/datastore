@@ -71,7 +71,7 @@ class OauthService
         return $user;
     }
 
-    public function logout(User $user)
+    public function clear(User $user): void
     {
         $user->setGoogleRefreshToken(null);
         $user->setGoogleExpires(null);
