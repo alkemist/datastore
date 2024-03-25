@@ -144,7 +144,8 @@ class User extends OAuthUser
     {
         return [
             'uid' => $this->id,
-            'email' => $this->email
+            'email' => $this->email,
+            'username' => $this->username,
         ];
     }
 }

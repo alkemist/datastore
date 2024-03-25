@@ -19,22 +19,12 @@ use Symfony\Component\Uid\Uuid;
 
 class ApiController extends AbstractController
 {
-    const ROUTE_TOKEN = 'token';
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ProjectRepository      $projectRepository,
         private StoreRepository        $storeRepository,
         private ItemRepository         $itemRepository,
     ) {
-    }
-
-    #[Route(path: '/token', name: self::ROUTE_TOKEN, methods: ['GET'])]
-    public function token(#[CurrentUser] User $user): Response
-    {
-        return (new ApiResponse())
-            ->setToken($user)
-            ->toJson();
     }
 
     #[Route(path: '/api/profile', name: 'api_profile', methods: ['GET'])]
@@ -70,23 +60,6 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
-    private function getStore(string $project_key, string $store_key)
-    {
-        $projectEntity = $this->projectRepository->findOneByKey($project_key);
-
-        if (!$projectEntity) {
-            throw new Exception("Unknown projet '$project_key'");
-        }
-
-        $storeEntity = $this->storeRepository->findOneByKey($projectEntity, $store_key);
-
-        if (!$storeEntity) {
-            throw new Exception("Unknown store_key '$project_key / $project_key'");
-        }
-
-        return $storeEntity;
-    }
-
     #[Route(path: '/api/store/{project_key}/{store_key}/{id}', name: 'api_get_item', methods: ['GET'])]
     public function item(#[CurrentUser] User $user, string $project_key, string $store_key, string $id): Response
     {
@@ -114,6 +87,9 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
+    /**
+     * @throws \Exception
+     */
     #[Route('/api/store/{project_key}/{store_key}', methods: ['PUT'])]
     public function create(
         #[CurrentUser] User $user, Request $request, string $project_key, string $store_key
@@ -123,6 +99,7 @@ class ApiController extends AbstractController
 
         try {
             $store = $this->getStore($project_key, $store_key);
+            $fields = $store->getFields()->toArray();
         } catch (\Exception $exception) {
             $response->isUnprocessableEntity($exception->getMessage());
             return $response->toJson();
@@ -136,9 +113,13 @@ class ApiController extends AbstractController
         $this->entityManager->flush();
 
         return $response
+            ->setItem($item->toJson($fields))
             ->toJson();
     }
 
+    /**
+     * @throws \Exception
+     */
     #[Route('/api/item/{id}', methods: ['POST'])]
     public function update(#[CurrentUser] User $user, Request $request, Uuid $id): Response
     {
@@ -161,7 +142,54 @@ class ApiController extends AbstractController
             )
         );
 
+        $fields = $item->getStore()->getFields()->toArray();
+
         return $response
+            ->setItem($item->toJson($fields))
             ->toJson();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route('/api/item/{id}', methods: ['DELETE'])]
+    public function delete(#[CurrentUser] User $user, Request $request, Uuid $id): Response
+    {
+        $response = (new ApiResponse())
+            ->setToken($user);
+
+        $item = $this->itemRepository->find($id);
+
+        if (!$item) {
+            return $response
+                ->isUnprocessableEntity("Unknown item '$id'")
+                ->toJson();
+        }
+
+        $fields = $item->getStore()->getFields()->toArray();
+
+        $this->entityManager->remove($item);
+        $this->entityManager->flush();
+
+        return $response
+            ->setItem($item->toJson($fields))
+            ->toJson();
+    }
+
+    private function getStore(string $project_key, string $store_key)
+    {
+        $projectEntity = $this->projectRepository->findOneByKey($project_key);
+
+        if (!$projectEntity) {
+            throw new Exception("Unknown projet '$project_key'");
+        }
+
+        $storeEntity = $this->storeRepository->findOneByKey($projectEntity, $store_key);
+
+        if (!$storeEntity) {
+            throw new Exception("Unknown store_key '$project_key / $project_key'");
+        }
+
+        return $storeEntity;
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class ApiAuthenticator extends AbstractAuthenticator
 {
     private OauthService $oauthService;
+    private const OAUTH_HEADER_NAME = 'X-AUTH-TOKEN';
 
     public function __construct(
         OauthService $oauthService,
@@ -37,8 +38,7 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        //$apiToken = $request->headers->get('X-AUTH-TOKEN');
-        $apiToken = $request->query->get('token'); // For dev
+        $apiToken = $request->headers->get(self::OAUTH_HEADER_NAME);
 
         if (!$apiToken) {
             throw new CustomUserMessageAuthenticationException('No API token provided');

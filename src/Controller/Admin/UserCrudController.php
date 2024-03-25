@@ -50,8 +50,12 @@ class UserCrudController extends AbstractCrudController
             ->setColumns(3);
         yield ArrayField::new('roles')
             ->setColumns(3);
-        yield TimeField::new('googleExpiresDiffDate')
-            ->setColumns(3)->setLabel('Token expire');
+
+        if (Crud::PAGE_INDEX === $pageName) {
+            yield TimeField::new('googleExpiresDiffDate')
+                ->setColumns(3)->setLabel('Token expire');
+        }
+
 
         if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_DETAIL === $pageName) {
             yield TextField::new('googleRefreshToken')

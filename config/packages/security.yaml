@@ -31,7 +31,6 @@ security:
       provider: users
 
       custom_authenticators:
-        - App\Security\TokenAuthenticator
         - App\Security\GoogleAuthenticator
 
       logout:
@@ -43,7 +42,6 @@ security:
   access_control:
     - { path: ^/admin, roles: [ IS_AUTHENTICATED_FULLY, ROLE_ADMIN ], requires_channel: 'https' }
     - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ], requires_channel: 'https' }
-    - { path: ^/token, roles: [ IS_AUTHENTICATED_FULLY ], requires_channel: 'https' }
     - { path: ^/login,  roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
     - { path: ^/, roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
 
