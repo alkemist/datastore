@@ -60,7 +60,10 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
-    #[Route(path: '/api/store/{project_key}/{store_key}/{id}', name: 'api_get_item', methods: ['GET'])]
+    /**
+     * @throws \Exception
+     */
+    #[Route(path: '/api/item/{id}', name: 'api_get_item', methods: ['GET'])]
     public function item(#[CurrentUser] User $user, string $project_key, string $store_key, string $id): Response
     {
         $response = (new ApiResponse())
@@ -82,6 +85,8 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
+        $fields = $item->getStore()->getFields()->toArray();
+
         return $response
             ->setItem($item->toJson($fields))
             ->toJson();
@@ -90,7 +95,7 @@ class ApiController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/api/store/{project_key}/{store_key}', methods: ['PUT'])]
+    #[Route('/api/store/{project_key}/{store_key}', name: 'api_put_item', methods: ['PUT'])]
     public function create(
         #[CurrentUser] User $user, Request $request, string $project_key, string $store_key
     ): Response {
@@ -120,7 +125,7 @@ class ApiController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/api/item/{id}', methods: ['POST'])]
+    #[Route('/api/item/{id}', name: 'api_post_item', methods: ['POST'])]
     public function update(#[CurrentUser] User $user, Request $request, Uuid $id): Response
     {
         $response = (new ApiResponse())
@@ -152,7 +157,7 @@ class ApiController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/api/item/{id}', methods: ['DELETE'])]
+    #[Route('/api/item/{id}', name: 'api_delete_item', methods: ['DELETE'])]
     public function delete(#[CurrentUser] User $user, Request $request, Uuid $id): Response
     {
         $response = (new ApiResponse())
@@ -168,12 +173,13 @@ class ApiController extends AbstractController
 
         $fields = $item->getStore()->getFields()->toArray();
 
+        $response
+            ->setItem($item->toJson($fields));
+
         $this->entityManager->remove($item);
         $this->entityManager->flush();
 
-        return $response
-            ->setItem($item->toJson($fields))
-            ->toJson();
+        return $response->toJson();
     }
 
     private function getStore(string $project_key, string $store_key)

@@ -33,7 +33,7 @@ class ApiAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        return str_starts_with($request->attributes->get('_route'), 'api_');
+        return true; //str_starts_with($request->attributes->get('_route'), 'api_');
     }
 
     public function authenticate(Request $request): Passport
