@@ -1,7 +1,7 @@
 <?php return array (
-  'flex.box/src/flexbox.css' => 
+  '@hotwired/stimulus' => 
   array (
-    'version' => '3.4.4',
+    'version' => '3.2.2',
     'dependencies' => 
     array (
     ),
