@@ -12,6 +12,9 @@ enum FieldTypeEnum: string
     case Boolean = 'boolean';
     case Datetime = 'datetime';
     case Json = 'json';
+    case ArrayString = 'array_string';
+    case ArrayInt = 'array_integer';
+    case ArrayFloat = 'array_float';
 
     public static function choices(): Traversable
     {
@@ -29,6 +32,9 @@ enum FieldTypeEnum: string
             self::Boolean => 'Boolean',
             self::Datetime => 'Datetime',
             self::Json => 'Json',
+            self::ArrayString => 'ArrayString',
+            self::ArrayInt => 'ArrayInt',
+            self::ArrayFloat => 'ArrayFloat',
         };
     }
 

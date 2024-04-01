@@ -3,9 +3,11 @@
 namespace App\Form\Subscriber;
 
 use App\Enum\FieldTypeEnum;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -25,6 +27,8 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
         FormInterface $form, mixed $data, FieldTypeEnum $type, string $valueField, string $valueLabel,
         string        $checkField, string $checkLabel
     ) {
+        $arrayOptions = ['allow_add' => true, 'allow_delete' => true, 'delete_empty' => true];
+
         // @TODO Rendre dynamique le "required" si le field est required
         switch ($type) {
             case FieldTypeEnum::Boolean:
@@ -37,19 +41,36 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
                 ]);
                 break;
             case FieldTypeEnum::Datetime:
-                $form->add($valueField, DateTimeType::class, ['label' => $valueLabel, 'required' => false]);
+                $form->add($valueField, DateTimeType::class, [
+                    'label' => $valueLabel, 'required' => false]);
                 break;
             case FieldTypeEnum::Int:
-                $form->add($valueField, IntegerType::class, ['label' => $valueLabel, 'required' => false]);
+                $form->add($valueField, IntegerType::class, [
+                    'label' => $valueLabel, 'required' => false]);
                 break;
             case FieldTypeEnum::Float:
-                $form->add($valueField, NumberType::class, ['label' => $valueLabel, 'required' => false]);
+                $form->add($valueField, NumberType::class, [
+                    'label' => $valueLabel, 'required' => false]);
                 break;
             case FieldTypeEnum::String:
-                $form->add($valueField, TextType::class, ['label' => $valueLabel, 'required' => false]);
+                $form->add($valueField, TextType::class, [
+                    'label' => $valueLabel, 'required' => false]);
+                break;
+            case FieldTypeEnum::ArrayString:
+                $form->add($valueField, CollectionType::class, [
+                    'label' => $valueLabel, 'required' => false, 'entry_type' => TextType::class, ...$arrayOptions]);
+                break;
+            case FieldTypeEnum::ArrayInt:
+                $form->add($valueField, CollectionType::class, [
+                    'label' => $valueLabel, 'required' => false, 'entry_type' => IntegerType::class, ...$arrayOptions]);
+                break;
+            case FieldTypeEnum::ArrayFloat:
+                $form->add($valueField, CollectionType::class, [
+                    'label' => $valueLabel, 'required' => false, 'entry_type' => NumberType::class, ...$arrayOptions]);
                 break;
             default:
-                $form->add($valueField, TextareaType::class, ['label' => $valueLabel, 'required' => false]);
+                $form->add($valueField, TextareaType::class, [
+                    'label' => $valueLabel, 'required' => false]);
                 break;
         }
 

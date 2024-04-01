@@ -8,6 +8,8 @@ use Exception;
 
 abstract class TypeHelper
 {
+    const ARRAY_TYPE_DELIMITER = '#';
+
     static function toBool(mixed $value): bool|null
     {
         if ($value === null) {
@@ -59,6 +61,21 @@ abstract class TypeHelper
     public static function dateToString(DateTimeInterface $value): string
     {
         return $value->format(DateTimeInterface::ATOM);
+    }
+
+    public static function arrayToString(array $value, string $type): string
+    {
+        return implode(TypeHelper::ARRAY_TYPE_DELIMITER, $value);
+    }
+
+
+    public static function stringToArray(string|array $value, string $type): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return explode(TypeHelper::ARRAY_TYPE_DELIMITER, $value);
     }
 
     public static function toString(mixed $value): string

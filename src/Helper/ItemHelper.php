@@ -10,8 +10,9 @@ use Exception;
 abstract class ItemHelper
 {
     /**
-     * @param Field[] $fields
+     * @param array $fields
      * @param Item|null $item
+     * @param bool|null $toJson
      * @return array
      * @throws Exception
      */
@@ -71,20 +72,26 @@ abstract class ItemHelper
             FieldTypeEnum::Float => TypeHelper::toFloat($value),
             FieldTypeEnum::Boolean => TypeHelper::toBool($value),
             FieldTypeEnum::Datetime => TypeHelper::toDate($value, $toJson),
+            FieldTypeEnum::ArrayString => TypeHelper::stringToArray($value, 'string'),
+            FieldTypeEnum::ArrayInt => TypeHelper::stringToArray($value, 'int'),
+            FieldTypeEnum::ArrayFloat => TypeHelper::stringToArray($value, 'float'),
             default => $value
         };
     }
 
     static function toString(mixed $value, FieldTypeEnum $type): string|null
     {
-        dump($value);
         if ($value === null) {
             return null;
         }
+        dump($type);
 
         return match ($type) {
             FieldTypeEnum::Boolean => TypeHelper::boolToString($value),
             FieldTypeEnum::Datetime => TypeHelper::dateToString($value),
+            FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, 'string'),
+            FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, 'int'),
+            FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, 'float'),
             default => (string)$value
         };
     }

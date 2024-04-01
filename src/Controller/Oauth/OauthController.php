@@ -19,6 +19,6 @@ class OauthController extends AbstractController
 
     public function redirectLogged(User $user, string $callback): RedirectResponse
     {
-        return $this->redirect($callback . '?token=' . $user->getGoogleRefreshToken());
+        return $this->redirect($callback . '?code=' . $user->getGoogleRefreshToken());
     }
 }
