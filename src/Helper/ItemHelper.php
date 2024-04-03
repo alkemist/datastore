@@ -16,12 +16,12 @@ abstract class ItemHelper
      * @return array
      * @throws Exception
      */
-    static function formatValues(array $fields, ?Item $item, ?bool $toJson): array
+    static function formatValues(array $fields, ?Item $item, ?bool $toJson = false): array
     {
         return array_reduce(
             $fields,
             function (array $current, Field $field) use ($item, $toJson) {
-                $current[$field->getKey()] = ItemHelper::formatValueWithDefault($field, $item, $toJson);
+                $current[$field->getName()] = ItemHelper::formatValueWithDefault($field, $item, $toJson);
                 return $current;
             },
             [],
@@ -31,9 +31,9 @@ abstract class ItemHelper
     /**
      * @throws Exception
      */
-    static function formatValueWithDefault(Field $field, ?Item $item, ?bool $toJson = false)
+    static function formatValueWithDefault(Field $field, ?Item $item, ?bool $toJson = false): mixed
     {
-        $value = ItemHelper::defaultValue($field, $item);
+        $value = ItemHelper::defaultValue($field, $item, $toJson);
 
         if ($value === null) {
             return null;
@@ -42,9 +42,9 @@ abstract class ItemHelper
         return ItemHelper::formatValue($field, $value, $toJson);
     }
 
-    static function defaultValue(Field $field, ?Item $item)
+    static function defaultValue(Field $field, ?Item $item, ?bool $toJson = false): mixed
     {
-        $value = ItemHelper::getValue($field, $item);
+        $value = ItemHelper::getValue($field, $item, $toJson);
         if ($value === null) {
             $value = $field->getDefaultValue();
 
@@ -56,9 +56,21 @@ abstract class ItemHelper
         return $value;
     }
 
-    static function getValue(Field $field, ?Item $item)
+    /**
+     * @throws Exception
+     */
+    static function getValue(Field $field, ?Item $item, ?bool $toJson = false): mixed
     {
-        return $item->getValues()[$field->getKey()] ?? null;
+        $values = $item->getValues();
+        $key = $field->getKey();
+        $name = $field->getName();
+        $value = isset($values[$name])
+            ? $values[$name]
+            : (isset($values[$key])
+                ? $values[$key]
+                : null);
+
+        return ItemHelper::formatValue($field, $value, $toJson);
     }
 
     /**
@@ -72,9 +84,10 @@ abstract class ItemHelper
             FieldTypeEnum::Float => TypeHelper::toFloat($value),
             FieldTypeEnum::Boolean => TypeHelper::toBool($value),
             FieldTypeEnum::Datetime => TypeHelper::toDate($value, $toJson),
-            FieldTypeEnum::ArrayString => TypeHelper::stringToArray($value, 'string'),
-            FieldTypeEnum::ArrayInt => TypeHelper::stringToArray($value, 'int'),
-            FieldTypeEnum::ArrayFloat => TypeHelper::stringToArray($value, 'float'),
+            FieldTypeEnum::Json => $toJson ? $value : TypeHelper::jsonToString($value),
+            FieldTypeEnum::ArrayString => $toJson ? $value : TypeHelper::arrayToString($value, 'string'),
+            FieldTypeEnum::ArrayInt => $toJson ? $value : TypeHelper::arrayToString($value, 'int'),
+            FieldTypeEnum::ArrayFloat => $toJson ? $value : TypeHelper::arrayToString($value, 'float'),
             default => $value
         };
     }
@@ -84,16 +97,33 @@ abstract class ItemHelper
         if ($value === null) {
             return null;
         }
-        dump($type);
 
         return match ($type) {
             FieldTypeEnum::Boolean => TypeHelper::boolToString($value),
             FieldTypeEnum::Datetime => TypeHelper::dateToString($value),
+            FieldTypeEnum::Json => TypeHelper::jsonToString($value),
             FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, 'string'),
             FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, 'int'),
             FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, 'float'),
             default => (string)$value
         };
+    }
+
+    /**
+     * @param array $values
+     * @param Field[] $fields
+     * @param bool|null $skipId
+     * @return array
+     */
+    static function filterValues(array $values, array $fields, ?bool $skipId = true): array
+    {
+        $keys = array_map(fn(Field $field) => $field->getName(), $fields);
+
+        return array_filter(
+            $values,
+            fn($key) => in_array($key, $keys) || (!$skipId && $key === 'id'),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     /**

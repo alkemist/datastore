@@ -42,15 +42,15 @@ class Item
     private ?DateTimeInterface $updated = null;
 
     /**
-     * @param Field[] $fields
+     * @param Store $store
      * @return array
      * @throws Exception
      */
-    public function toJson(array $fields): array
+    public function toJson(Store $store): array
     {
         return [
             'id' => $this->id,
-            ...ItemHelper::formatValues($fields, $this, true)
+            ...ItemHelper::formatValues($store->getFields()->toArray(), $this, true)
         ];
     }
 
@@ -112,7 +112,7 @@ class Item
     {
         $this->setValues(
             array_combine(
-                array_map(static fn(ItemFieldValue $itemFieldValue) => $itemFieldValue->getField()->getKey(),
+                array_map(static fn(ItemFieldValue $itemFieldValue) => $itemFieldValue->getField()->getName(),
                     $jsonValues),
                 array_map(static fn(ItemFieldValue $itemFieldValue) => ItemHelper::toString(
                     $itemFieldValue->getValue(),

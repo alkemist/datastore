@@ -67,17 +67,17 @@ class Field extends ParentEntity
 
     public function __toString(): string
     {
-        return $this->getKey() . ' : ' . $this->getType()->name;
+        return $this->getName() . ' : ' . $this->getType()->name;
     }
 
-    public function getKey(): ?string
+    public function getName(): ?string
     {
-        return $this->key;
+        return $this->name;
     }
 
-    public function setKey(string $key): static
+    public function setName(string $name): static
     {
-        $this->key = $key;
+        $this->name = $name;
 
         return $this;
     }
@@ -94,14 +94,14 @@ class Field extends ParentEntity
         return $this;
     }
 
-    public function getName(): ?string
+    public function getKey(): ?string
     {
-        return $this->name;
+        return $this->key;
     }
 
-    public function setName(string $name): static
+    public function setKey(string $key): static
     {
-        $this->name = $name;
+        $this->key = $key;
 
         return $this;
     }

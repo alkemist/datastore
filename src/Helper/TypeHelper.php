@@ -63,11 +63,23 @@ abstract class TypeHelper
         return $value->format(DateTimeInterface::ATOM);
     }
 
-    public static function arrayToString(array $value, string $type): string
+    public static function arrayToString(array|string $value, string $type): string
     {
+        if (!is_array($value)) {
+            return $value;
+        }
+
         return implode(TypeHelper::ARRAY_TYPE_DELIMITER, $value);
     }
 
+    public static function jsonToString(array|string|null $value): string|null
+    {
+        if (is_array($value) && $value !== null) {
+            return json_encode($value, JSON_PRETTY_PRINT);
+        }
+
+        return $value;
+    }
 
     public static function stringToArray(string|array $value, string $type): array
     {

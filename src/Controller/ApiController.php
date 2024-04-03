@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Item;
+use App\Entity\Store;
 use App\Entity\User;
+use App\Helper\ItemHelper;
 use App\Model\ApiResponse;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectRepository;
@@ -37,27 +39,93 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
+    /**
+     * @throws \Exception
+     */
     #[Route(path: '/api/store/{project_key}/{store_key}', name: 'api_get_items', methods: ['GET'])]
-    public function items(#[CurrentUser] User $user, string $project_key, string $store_key): Response
-    {
+    public function items(
+        #[CurrentUser] User $user,
+        Request             $request,
+        string              $project_key,
+        string              $store_key
+    ): Response {
         $response = (new ApiResponse())
             ->setToken($user);
 
         try {
             $store = $this->getStore($project_key, $store_key);
-            $fields = $store->getFields()->toArray();
-            $items = $store->getItems()->toArray();
         } catch (\Exception $exception) {
             $response->isUnprocessableEntity($exception->getMessage());
             return $response->toJson();
         }
 
+        $items = $store->getItems()->toArray();
 
         return $response
             ->setItems(
-                array_map(static fn(Item $item) => $item->toJson($fields), $items)
+                array_map(
+                    static fn(Item $item) => $item->toJson($store), $items
+                )
             )
             ->toJson();
+    }
+
+    private function getStore(string $project_key, string $store_key): Store
+    {
+        $projectEntity = $this->projectRepository->findOneByKey($project_key);
+
+        if (!$projectEntity) {
+            throw new Exception("Unknown projet '$project_key'");
+        }
+
+        $storeEntity = $this->storeRepository->findOneByKey($projectEntity, $store_key);
+
+        if (!$storeEntity) {
+            throw new Exception("Unknown store_key '$project_key / $project_key'");
+        }
+
+        return $storeEntity;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route(path: '/api/store/{project_key}/{store_key}/search', name: 'api_search_items', methods: ['POST'])]
+    public function search(
+        #[CurrentUser] User $user,
+        Request             $request,
+        string              $project_key,
+        string              $store_key
+    ): Response {
+        $response = (new ApiResponse())
+            ->setToken($user);
+
+        try {
+            $store = $this->getStore($project_key, $store_key);
+        } catch (\Exception $exception) {
+            $response->isUnprocessableEntity($exception->getMessage());
+            return $response->toJson();
+        }
+
+        $filters = $this->filterPostData($request, $store, false);
+
+        $items = $this->itemRepository->findByValues($filters);
+
+        return $response
+            ->setItems(
+                array_map(
+                    static fn(Item $item) => $item->toJson($store), $items
+                )
+            )
+            ->toJson();
+    }
+
+    private function filterPostData(Request $request, Store $store, bool $skipId = true): array
+    {
+        $content = $request->getContent();
+        $values = json_decode($content, true);
+
+        return ItemHelper::filterValues($values, $store->getFields()->toArray(), $skipId);
     }
 
     /**
@@ -85,10 +153,61 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        $fields = $item->getStore()->getFields()->toArray();
+        return $response
+            ->setItem($item->toJson($item->getStore()))
+            ->toJson();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route('/api/store/{project_key}/{store_key}/exist', name: 'api_exist_create_item', methods: ['PUT'])]
+    public function exist_create(
+        #[CurrentUser] User $user, Request $request, string $project_key, string $store_key
+    ): Response {
+        $response = (new ApiResponse())
+            ->setToken($user);
+
+        try {
+            $store = $this->getStore($project_key, $store_key);
+        } catch (\Exception $exception) {
+            $response->isUnprocessableEntity($exception->getMessage());
+            return $response->toJson();
+        }
+
+        $values = $this->filterPostData($request, $store, false);
+
+        $items = $this->itemRepository->findByValues($values);
 
         return $response
-            ->setItem($item->toJson($fields))
+            ->setResponse(count($items) > 0)
+            ->toJson();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route('/api/item/{id}/exist', name: 'api_exist_update_item', methods: ['POST'])]
+    public function exist_update(
+        #[CurrentUser] User $user, Request $request, Uuid $id
+    ): Response {
+        $response = (new ApiResponse())
+            ->setToken($user);
+
+        $item = $this->itemRepository->find($id);
+
+        if (!$item) {
+            return $response
+                ->isUnprocessableEntity("Unknown item '$id'")
+                ->toJson();
+        }
+
+        $values = $this->filterPostData($request, $item->getStore(), false);
+
+        $items = $this->itemRepository->findByValues($values, $id);
+
+        return $response
+            ->setResponse(count($items) > 0)
             ->toJson();
     }
 
@@ -104,21 +223,21 @@ class ApiController extends AbstractController
 
         try {
             $store = $this->getStore($project_key, $store_key);
-            $fields = $store->getFields()->toArray();
         } catch (\Exception $exception) {
             $response->isUnprocessableEntity($exception->getMessage());
             return $response->toJson();
         }
 
+        $values = $this->filterPostData($request, $store);
+
         $item = new Item();
         $item->setStore($store);
-        $item->setValues($request->request->all());
-
+        $item->setValues($values);
         $this->entityManager->persist($item);
         $this->entityManager->flush();
 
         return $response
-            ->setItem($item->toJson($fields))
+            ->setItem($item->toJson($store))
             ->toJson();
     }
 
@@ -139,18 +258,14 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        $item->setValues(
-            array_filter(
-                $request->request->all(),
-                fn($key) => $key !== 'id',
-                ARRAY_FILTER_USE_KEY
-            )
-        );
 
-        $fields = $item->getStore()->getFields()->toArray();
+        $store = $item->getStore();
+
+        $values = $this->filterPostData($request, $store);
+        $item->setValues($values);
 
         return $response
-            ->setItem($item->toJson($fields))
+            ->setItem($item->toJson($store))
             ->toJson();
     }
 
@@ -171,31 +286,14 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        $fields = $item->getStore()->getFields()->toArray();
+        $store = $item->getStore();
 
         $response
-            ->setItem($item->toJson($fields));
+            ->setItem($item->toJson($store));
 
         $this->entityManager->remove($item);
         $this->entityManager->flush();
 
         return $response->toJson();
-    }
-
-    private function getStore(string $project_key, string $store_key)
-    {
-        $projectEntity = $this->projectRepository->findOneByKey($project_key);
-
-        if (!$projectEntity) {
-            throw new Exception("Unknown projet '$project_key'");
-        }
-
-        $storeEntity = $this->storeRepository->findOneByKey($projectEntity, $store_key);
-
-        if (!$storeEntity) {
-            throw new Exception("Unknown store_key '$project_key / $project_key'");
-        }
-
-        return $storeEntity;
     }
 }

@@ -90,7 +90,15 @@ class Store extends ParentEntity
 
     public function getFieldKeys(): array
     {
-        return array_map(static fn(Field $field) => $field->getKey(), $this->getFields()->toArray());
+        return array_map(static fn(Field $field) => $field->getName(), $this->getFields()->toArray());
+    }
+
+    /**
+     * @return Collection<int, Field>
+     */
+    public function getFields(): Collection
+    {
+        return $this->fields;
     }
 
     public function getKey(): ?string
@@ -103,14 +111,6 @@ class Store extends ParentEntity
         $this->key = $key;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Field>
-     */
-    public function getFields(): Collection
-    {
-        return $this->fields;
     }
 
     public function getId(): ?Uuid

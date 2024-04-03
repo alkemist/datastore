@@ -9,4 +9,24 @@
     array (
     ),
   ),
+  'chart.js/auto' => 
+  array (
+    'version' => '3.9.1',
+    'dependencies' => 
+    array (
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
+  '@simplewebauthn/browser' => 
+  array (
+    'version' => '7.4.0',
+    'dependencies' => 
+    array (
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
 );

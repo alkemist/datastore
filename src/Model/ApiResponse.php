@@ -22,6 +22,12 @@ class ApiResponse extends ArrayObject
         return $this;
     }
 
+    function setResponse(mixed $response): static
+    {
+        $this->offsetSet('response', $response);
+        return $this;
+    }
+
     function setItem(mixed $item): static
     {
         $this->offsetSet('item', $item);

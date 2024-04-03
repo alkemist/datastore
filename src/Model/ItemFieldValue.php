@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Entity\Field;
 use App\Enum\FieldTypeEnum;
 use App\Helper\ItemHelper;
+use Exception;
 
 class ItemFieldValue
 {
@@ -31,7 +32,7 @@ class ItemFieldValue
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function setIsDefaultValue(bool $isDefaultValue): void
     {
@@ -48,7 +49,7 @@ class ItemFieldValue
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getValue()
     {
@@ -77,6 +78,6 @@ class ItemFieldValue
 
     public function __toString(): string
     {
-        return $this->field->getKey();
+        return $this->field->getName();
     }
 }
