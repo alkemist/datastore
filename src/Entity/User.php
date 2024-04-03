@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use KnpU\OAuth2ClientBundle\Security\User\OAuthUser;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -37,6 +38,9 @@ class User extends OAuthUser
 
     #[ORM\Column(nullable: true)]
     private ?int $googleExpires = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $data = null;
 
     public function __construct($username = '', array $roles = ['ROLE_USER'])
     {
@@ -123,16 +127,6 @@ class User extends OAuthUser
         return $this->googleExpires;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getGoogleExpiresDiffDate(): ?DateTime
-    {
-        return $this->googleExpires > time()
-        ? DateTime::createFromFormat( 'U', $this->googleExpires - time() )
-        : null;
-    }
-
     public function setGoogleExpires(?int $googleExpires): static
     {
         $this->googleExpires = $googleExpires;
@@ -140,12 +134,35 @@ class User extends OAuthUser
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function getGoogleExpiresDiffDate(): ?DateTime
+    {
+        return $this->googleExpires > time()
+            ? DateTime::createFromFormat('U', $this->googleExpires - time())
+            : null;
+    }
+
     public function toArray()
     {
         return [
-            'uid' => $this->id,
-            'email' => $this->email,
+            'id'       => $this->id,
+            'email'    => $this->email,
             'username' => $this->username,
+            'data'     => $this->data,
         ];
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
+    public function setData(?array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
     }
 }

@@ -46,3 +46,9 @@ body {
     }
   }
 }
+
+.form-widget {
+  .CodeMirror + .CodeMirror {
+    display: none;
+  }
+}
