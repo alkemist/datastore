@@ -3,6 +3,7 @@
 namespace App\Form\Subscriber;
 
 use App\Model\ItemFieldValue;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 
@@ -23,8 +24,12 @@ class ItemFieldValueSubscriber extends DynamicFieldSubscriber
             parent::preSetDataWithField(
                 $form, $data, $data->getType(),
                 'value', 'value',
-                'isDefaultValue', 'Default value'
             );
+
+            $form->add('isDefaultValue', CheckboxType::class, [
+                'label'    => 'Default value',
+                'required' => false
+            ]);
         }
     }
 }

@@ -12,21 +12,18 @@
  * The "importmap:require" command can be used to add new entries to this file.
  */
 return [
-    'app' => [
-        'path' => 'app.js',
+    'app'                     => [
+        'path'       => 'app.js',
         'entrypoint' => true,
     ],
-    'easyadmin' => [
-        'path' => 'easyadmin.js',
+    'easyadmin'               => [
+        'path'       => 'easyadmin.js',
         'entrypoint' => true,
     ],
-    '@hotwired/stimulus' => [
+    '@hotwired/stimulus'      => [
         'version' => '3.2.2',
     ],
-    '@symfony/stimulus-bundle' => [
-        'path' => '@symfony/stimulus-bundle/loader.js',
-    ],
-    'chart.js/auto' => [
+    'chart.js/auto'           => [
         'version' => '3.9.1',
     ],
     '@simplewebauthn/browser' => [

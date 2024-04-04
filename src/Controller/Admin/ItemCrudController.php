@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Item;
+use App\Filter\JsonFilter;
 use App\Form\Type\ItemFieldValueType;
 use App\Helper\ItemHelper;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -11,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -30,8 +32,8 @@ class ItemCrudController extends BaseCrudController
         return $crud
             ->setEntityLabelInSingular('Item')
             ->setEntityLabelInPlural('Items')
-            ->setDefaultSort(['store' => 'ASC'])
-            ->setSearchFields(['id', 'key', 'name', 'store.key'])
+            ->setDefaultSort(['store' => 'ASC', 'updated' => 'DESC'])
+            ->setSearchFields(['id', 'store.key', 'slug'])
             ->showEntityActionsInlined(true);
     }
 
@@ -78,7 +80,11 @@ class ItemCrudController extends BaseCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters->add('store');
+        return $filters
+            ->add('store')
+            ->add('id')
+            ->add('slug')
+            ->add(JsonFilter::new('values'));
     }
 
     public function configureFields(string $pageName): iterable
@@ -91,6 +97,8 @@ class ItemCrudController extends BaseCrudController
                 ->setColumns(12);
         }
 
+        yield TextField::new('slug')
+            ->setColumns(12);
 
         if (Crud::PAGE_INDEX !== $pageName) {
             yield FormField::addFieldset('Values');
@@ -107,6 +115,8 @@ class ItemCrudController extends BaseCrudController
             yield TextAreaField::new('stringValues')
                 ->setLabel("Values")
                 ->renderAsHtml();
+
+            yield DateField::new('updated');
         }
     }
 

@@ -51,4 +51,24 @@ body {
   .CodeMirror + .CodeMirror {
     display: none;
   }
+
+  .jsonFilter {
+    .form-group {
+      display: -webkit-flex;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-content: center;
+      align-items: stretch;
+
+      & > label {
+        width: 60px;
+      }
+
+      & > .form-widget {
+        flex: 1 1 auto;
+      }
+    }
+  }
 }

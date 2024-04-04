@@ -95,20 +95,6 @@ class DashboardController extends AbstractDashboardController
                 ->setQueryParameter('filters[project][value]', $project->getId());
 
             foreach ($this->storeRepository->findByProject($project) as $store) {
-
-                /*yield MenuItem::subMenu($store->getName(), 'fas fa-diagram-project')
-                    ->setSubItems([
-                                      MenuItem::linkToCrud(
-                                          'Fields', 'fa fa-shapes', Field::class
-                                      )
-                                          ->setQueryParameter('filters[store][comparison]', '=')
-                                          ->setQueryParameter('filters[store][value]', $store->getId()),
-                                      MenuItem::linkToCrud(
-                                          'Items', 'fa fa-list', Item::class
-                                      )
-                                          ->setQueryParameter('filters[store][comparison]', '=')
-                                          ->setQueryParameter('filters[store][value]', $store->getId()),
-                                  ]);*/
                 yield MenuItem::linkToCrud(
                     $store->getName(), 'fas fa-list', Item::class
                 )

@@ -84,10 +84,6 @@ abstract class ItemHelper
             FieldTypeEnum::Float => TypeHelper::toFloat($value),
             FieldTypeEnum::Boolean => TypeHelper::toBool($value),
             FieldTypeEnum::Datetime => TypeHelper::toDate($value, $toJson),
-            FieldTypeEnum::Json => $toJson ? $value : TypeHelper::jsonToString($value),
-            FieldTypeEnum::ArrayString => $toJson ? $value : TypeHelper::arrayToString($value, 'string'),
-            FieldTypeEnum::ArrayInt => $toJson ? $value : TypeHelper::arrayToString($value, 'int'),
-            FieldTypeEnum::ArrayFloat => $toJson ? $value : TypeHelper::arrayToString($value, 'float'),
             default => $value
         };
     }
@@ -101,7 +97,7 @@ abstract class ItemHelper
         return match ($type) {
             FieldTypeEnum::Boolean => TypeHelper::boolToString($value),
             FieldTypeEnum::Datetime => TypeHelper::dateToString($value),
-            FieldTypeEnum::Json => TypeHelper::jsonToString($value),
+            //FieldTypeEnum::Json => TypeHelper::jsonToString($value),
             FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, 'string'),
             FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, 'int'),
             FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, 'float'),
@@ -112,16 +108,15 @@ abstract class ItemHelper
     /**
      * @param array $values
      * @param Field[] $fields
-     * @param bool|null $skipId
      * @return array
      */
-    static function filterValues(array $values, array $fields, ?bool $skipId = true): array
+    static function filterValues(array $values, array $fields): array
     {
         $keys = array_map(fn(Field $field) => $field->getName(), $fields);
 
         return array_filter(
             $values,
-            fn($key) => in_array($key, $keys) || (!$skipId && $key === 'id'),
+            fn($key) => in_array($key, $keys) || ($key === 'id' || $key === 'slug'),
             ARRAY_FILTER_USE_KEY
         );
     }

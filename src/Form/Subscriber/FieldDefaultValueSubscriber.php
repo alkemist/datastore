@@ -28,11 +28,20 @@ class FieldDefaultValueSubscriber extends DynamicFieldSubscriber
             parent::preSetDataWithField(
                 $form, $data, $data->getType(),
                 'formattedDefaultValue', 'default value',
-                'isNull', 'Null value'
             );
+
+            $form->add('isNull', CheckboxType::class, [
+                'label'    => 'Null value',
+                'required' => false
+            ]);
         }
 
         $form->add('required', CheckboxType::class, [
+            'required' => false
+        ]);
+
+        $form->add('identify', CheckboxType::class, [
+            'label'    => 'Unique',
             'required' => false
         ]);
     }

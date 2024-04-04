@@ -52,6 +52,9 @@ class Field extends ParentEntity
     #[ORM\Column(nullable: true)]
     private ?bool $required = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $identify = null;
+
     public function __construct()
     {
         $this->type = FieldTypeEnum::String;
@@ -174,6 +177,18 @@ class Field extends ParentEntity
     public function setRequired(?bool $required): static
     {
         $this->required = $required;
+
+        return $this;
+    }
+
+    public function isIdentify(): ?bool
+    {
+        return $this->identify;
+    }
+
+    public function setIdentify(?bool $identify): static
+    {
+        $this->identify = $identify;
 
         return $this;
     }

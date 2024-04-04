@@ -3,9 +3,8 @@
 namespace App\Form\Subscriber;
 
 use App\Enum\FieldTypeEnum;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use App\Form\Type\JsonTextareaType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -24,9 +23,8 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
     }
 
     public function preSetDataWithField(
-        FormInterface $form, mixed $data, FieldTypeEnum $type, string $valueField, string $valueLabel,
-        string        $checkField, string $checkLabel
-    ) {
+        FormInterface $form, mixed $data, FieldTypeEnum $type, string $valueField, string $valueLabel
+    ): void {
         $arrayOptions = ['allow_add' => true, 'allow_delete' => true, 'delete_empty' => true];
 
         // @TODO Rendre dynamique le "required" si le field est required
@@ -56,6 +54,10 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
                 $form->add($valueField, TextType::class, [
                     'label' => $valueLabel, 'required' => false]);
                 break;
+            case FieldTypeEnum::Json:
+                $form->add($valueField, JsonTextareaType::class, [
+                    'label' => $valueLabel, 'required' => false, 'attr' => ['rows' => 5]]);
+                break;
             case FieldTypeEnum::ArrayString:
                 $form->add($valueField, CollectionType::class, [
                     'label' => $valueLabel, 'required' => false, 'entry_type' => TextType::class, ...$arrayOptions]);
@@ -73,10 +75,5 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
                     'label' => $valueLabel, 'required' => false]);
                 break;
         }
-
-        $form->add($checkField, CheckboxType::class, [
-            'label'    => $checkLabel,
-            'required' => false
-        ]);
     }
 }

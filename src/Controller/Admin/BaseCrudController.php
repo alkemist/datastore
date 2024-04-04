@@ -36,7 +36,7 @@ abstract class BaseCrudController extends AbstractCrudController
         $queryParams = $context->getRequest()->query
             ->all();
 
-        if (!isset($queryParams['filters'])) {
+        if (!isset($queryParams['filters']) || !isset($queryParams['filters'][$filterName])) {
             return null;
         }
 

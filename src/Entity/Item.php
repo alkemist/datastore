@@ -18,6 +18,10 @@ use Symfony\Component\Uid\Uuid;
     name   : 'item_idx',
     columns: ['store_id', 'id']
 )]
+#[ORM\UniqueConstraint(
+    name   : 'item_slug_idx',
+    columns: ['store_id', 'slug']
+)]
 class Item
 {
     #[ORM\Id]
@@ -25,6 +29,9 @@ class Item
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private Uuid|null $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'items')]
     #[ORM\JoinColumn(nullable: false)]
@@ -49,14 +56,32 @@ class Item
     public function toJson(Store $store): array
     {
         return [
-            'id' => $this->id,
+            'id'   => $this->getId(),
+            'slug' => $this->getSlug(),
             ...ItemHelper::formatValues($store->getFields()->toArray(), $this, true)
         ];
     }
 
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
-        return $this->getStore()->getProject() . ' / ' . $this->getStore() . ' / ' . $this->getId();
+        return $this->getStore()->getProject() . ' / ' . $this->getStore() . ' / ' . $this->getSlug();
     }
 
     public function getStore(): ?Store
@@ -69,11 +94,6 @@ class Item
         $this->store = $store;
 
         return $this;
-    }
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
     }
 
     /**
@@ -108,17 +128,21 @@ class Item
         return $this;
     }
 
+    /**
+     * @param $jsonValues
+     * @return void
+     * @throws Exception
+     */
     public function setItemFieldValues($jsonValues): void
     {
         $this->setValues(
             array_combine(
                 array_map(static fn(ItemFieldValue $itemFieldValue) => $itemFieldValue->getField()->getName(),
                     $jsonValues),
-                array_map(static fn(ItemFieldValue $itemFieldValue) => ItemHelper::toString(
-                    $itemFieldValue->getValue(),
-                    $itemFieldValue->getType()
+                array_map(
+                    static fn(ItemFieldValue $itemFieldValue) => $itemFieldValue->getValue(),
+                    $jsonValues
                 ),
-                    $jsonValues),
             )
         );
     }

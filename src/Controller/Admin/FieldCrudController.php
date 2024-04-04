@@ -80,6 +80,9 @@ class FieldCrudController extends BaseCrudController
 
             yield BooleanField::new('required')
                 ->setColumns(4);
+
+            yield BooleanField::new('identify')
+                ->setColumns(4);
         }
     }
 
