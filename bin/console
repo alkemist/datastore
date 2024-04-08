@@ -4,14 +4,24 @@
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
-if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {
+if (!is_file(dirname(__DIR__) . '/vendor/autoload_runtime.php')) {
     throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
 }
 
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
 
 return function (array $context) {
-    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $env = $context['APP_ENV'];
+    $debug = (bool)$context['APP_DEBUG'];
+    $devIp = $context['APP_DEV_IP'];
+    $ignoreIp = (bool)$context['APP_IGNORE_IP'];
+
+    if (!$ignoreIp && $_SERVER['REMOTE_ADDR'] === $devIp) {
+        $env = 'dev';
+        $debug = true;
+    }
+
+    $kernel = new Kernel($env, $debug);
 
     return new Application($kernel);
 };
