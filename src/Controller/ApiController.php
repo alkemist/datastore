@@ -22,10 +22,10 @@ use Symfony\Component\Uid\Uuid;
 class ApiController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private ProjectRepository      $projectRepository,
-        private StoreRepository        $storeRepository,
-        private ItemRepository         $itemRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ProjectRepository      $projectRepository,
+        private readonly StoreRepository        $storeRepository,
+        private readonly ItemRepository         $itemRepository,
     ) {
     }
 
@@ -40,14 +40,13 @@ class ApiController extends AbstractController
 
     private function buildResponse(User $user): ApiResponse
     {
-        return (new ApiResponse())
-            ->setToken($user);
+        return (new ApiResponse())->setToken($user);
     }
 
     /**
      * @throws \Exception
      */
-    #[Route(path: '/api/store/{project_key}/{store_key}', name: 'api_get_items', methods: ['GET'])]
+    #[Route(path: '/api/store/{project_key}/{store_key}', name: 'api_store_items', methods: ['GET'])]
     public function items(
         #[CurrentUser] User $user,
         string              $project_key,
@@ -63,7 +62,7 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        $items = $store->getItems()->toArray();
+        $items = $this->itemRepository->findByStore($user, $store);
 
         return $response
             ->setItems(
@@ -94,6 +93,41 @@ class ApiController extends AbstractController
     /**
      * @throws \Exception
      */
+    #[Route(path: '/api/public/{project_key}/{store_key}', name: 'api_public_items', methods: ['GET'])]
+    public function public_items(
+        string $project_key,
+        string $store_key
+    ): Response {
+        $response = new ApiResponse();
+
+        try {
+            $store = $this->getStore($project_key, $store_key);
+        } catch (\Exception $exception) {
+            return $response
+                ->isUnprocessableEntity($exception->getMessage())
+                ->toJson();
+        }
+
+        if ($store->isRestrictedByUser()) {
+            return $response
+                ->isUnprocessableEntity('Restricted store')
+                ->toJson();
+        }
+
+        $items = $store->getItems()->toArray();
+
+        return $response
+            ->setItems(
+                array_map(
+                    static fn(Item $item) => $item->toJson($store), $items
+                )
+            )
+            ->toJson();
+    }
+
+    /**
+     * @throws \Exception
+     */
     #[Route(path: '/api/store/{project_key}/{store_key}/search/items', name: 'api_search_items', methods: ['POST'])]
     public function search_items(
         #[CurrentUser] User $user,
@@ -113,7 +147,7 @@ class ApiController extends AbstractController
 
         $filters = $this->filterPostData($request, $store);
 
-        $items = $this->itemRepository->findByFilters($store, $filters);
+        $items = $this->itemRepository->findByFilters($user, $store, $filters);
 
         return $response
             ->setItems(
@@ -154,7 +188,7 @@ class ApiController extends AbstractController
 
         $filters = $this->filterPostData($request, $store);
 
-        $items = $this->itemRepository->findByFilters($store, $filters);
+        $items = $this->itemRepository->findByFilters($user, $store, $filters);
 
         if (count($items) === 0) {
             return $response
@@ -179,8 +213,12 @@ class ApiController extends AbstractController
      * @throws \Exception
      */
     #[Route(path: '/api/store/{project_key}/{store_key}/{slug}', name: 'api_get_item', methods: ['GET'])]
-    public function item(#[CurrentUser] User $user, string $project_key, string $store_key, string $slug): Response
-    {
+    public function item(
+        #[CurrentUser] User $user,
+        string              $project_key,
+        string              $store_key,
+        string              $slug
+    ): Response {
         $response = $this->buildResponse($user);
 
         try {
@@ -189,6 +227,45 @@ class ApiController extends AbstractController
         } catch (\Exception $exception) {
             return $response
                 ->isUnprocessableEntity($exception->getMessage())
+                ->toJson();
+        }
+
+        $item = $this->itemRepository->findOneByUserAndSlug($user, $store, $slug);
+
+        if (!$item) {
+            return $response
+                ->isUnprocessableEntity("Unknown item '$slug'")
+                ->toJson();
+        }
+
+        return $response
+            ->setItem($item->toJson($item->getStore()))
+            ->toJson();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route(path: '/api/public/{project_key}/{store_key}/{slug}', name: 'api_public_item', methods: ['GET'])]
+    public function public_item(
+        string $project_key,
+        string $store_key,
+        string $slug
+    ): Response {
+        $response = new ApiResponse();
+
+        try {
+            $store = $this->getStore($project_key, $store_key);
+            $fields = $store->getFields()->toArray();
+        } catch (\Exception $exception) {
+            return $response
+                ->isUnprocessableEntity($exception->getMessage())
+                ->toJson();
+        }
+
+        if ($store->isRestrictedByUser()) {
+            return $response
+                ->isUnprocessableEntity('Restricted store')
                 ->toJson();
         }
 
@@ -224,7 +301,7 @@ class ApiController extends AbstractController
 
         $values = $this->filterPostData($request, $store);
 
-        $items = $this->itemRepository->findExistingItems($store, $values);
+        $items = $this->itemRepository->findExistingItems($user, $store, $values);
 
         return $response
             ->setResponse(count($items) > 0)
@@ -251,7 +328,7 @@ class ApiController extends AbstractController
         $store = $item->getStore();
         $values = $this->filterPostData($request, $item->getStore());
 
-        $items = $this->itemRepository->findExistingItems($store, $values, $id);
+        $items = $this->itemRepository->findExistingItems($user, $store, $values, $id);
 
         return $response
             ->setResponse(count($items) > 0)
@@ -283,6 +360,7 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
+        $item->setAuthor($user);
         $item->setStore($store);
 
         $this->entityManager->persist($item);
@@ -327,6 +405,12 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
+        if ($user->getId() !== !$item->getAuthor()->getId()) {
+            return $response
+                ->isUnprocessableEntity("You are not the author of item '$id'")
+                ->toJson();
+        }
+
         $store = $item->getStore();
 
         if (!$this->checkSlug($store, $item, $request)) {
@@ -355,6 +439,12 @@ class ApiController extends AbstractController
         if (!$item) {
             return $response
                 ->isUnprocessableEntity("Unknown item '$id'")
+                ->toJson();
+        }
+
+        if ($user->getId() !== !$item->getAuthor()->getId()) {
+            return $response
+                ->isUnprocessableEntity("You are not the author of item '$id'")
                 ->toJson();
         }
 

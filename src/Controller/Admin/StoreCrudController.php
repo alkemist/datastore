@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
@@ -27,10 +28,13 @@ class StoreCrudController extends BaseCrudController
 
         yield SlugField::new('key')
             ->setTargetFieldName('name')
-            ->setColumns(6);
+            ->setColumns(5);
 
         yield TextField::new('name')
-            ->setColumns(6);
+            ->setColumns(5);
+
+        yield BooleanField::new('restrictedByUser')
+            ->setColumns(2);
 
         if (Crud::PAGE_INDEX !== $pageName) {
             yield FormField::addFieldset('Fields');

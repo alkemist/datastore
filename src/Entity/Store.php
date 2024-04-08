@@ -46,6 +46,9 @@ class Store extends ParentEntity
     #[ORM\OrderBy(["id" => "ASC"])]
     private Collection $items;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $restrictedByUser = null;
+
     public function __construct()
     {
         $this->fields = new ArrayCollection();
@@ -166,6 +169,18 @@ class Store extends ParentEntity
                 $item->setStore(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isRestrictedByUser(): ?bool
+    {
+        return $this->restrictedByUser;
+    }
+
+    public function setRestrictedByUser(?bool $restrictedByUser): static
+    {
+        $this->restrictedByUser = $restrictedByUser;
 
         return $this;
     }

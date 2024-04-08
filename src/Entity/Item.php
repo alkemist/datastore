@@ -48,6 +48,9 @@ class Item
     #[Gedmo\Timestampable(on: "update")]
     private ?DateTimeInterface $updated = null;
 
+    #[ORM\ManyToOne]
+    private ?User $author = null;
+
     /**
      * @param Store $store
      * @return array
@@ -167,6 +170,18 @@ class Item
     public function setUpdated(?DateTimeInterface $updated): static
     {
         $this->updated = $updated;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }

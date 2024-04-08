@@ -17,8 +17,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
-    private OauthService $oauthService;
     private const OAUTH_HEADER_NAME = 'X-AUTH-TOKEN';
+
+    private OauthService $oauthService;
 
     public function __construct(
         OauthService $oauthService,
@@ -33,7 +34,7 @@ class ApiAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        return true; //str_starts_with($request->attributes->get('_route'), 'api_');
+        return !str_starts_with($request->attributes->get('_route'), 'api_public_');
     }
 
     public function authenticate(Request $request): Passport

@@ -47,7 +47,7 @@ class User extends OAuthUser
         parent::__construct($username, $roles);
     }
 
-    public function getUserIdentifier(): string
+    public function __toString(): string
     {
         return $this->getUsername();
     }
@@ -62,6 +62,11 @@ class User extends OAuthUser
         $this->username = $username;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUsername();
     }
 
     public function getId(): ?Uuid

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Item;
 use App\Entity\Store;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,16 +27,22 @@ class ItemRepository extends ServiceEntityRepository
 
     /**
      * Recherche avec filtres
+     * @param User $user
      * @param Store $store
      * @param array $filters
      * @return float|int|mixed|string
      */
-    public function findByFilters(Store $store, array $filters)
+    public function findByFilters(User $user, Store $store, array $filters): mixed
     {
         $query = $this->createQueryBuilder('i');
 
         foreach ($filters as $field_key => $field_value) {
-            if ($field_key === 'slug') {
+            if ($field_key === 'author') {
+                $query->andWhere(
+                    $query->expr()->like("i.author", ":author")
+                )
+                    ->setParameter("author", $field_value);
+            } else if ($field_key === 'slug') {
                 $query->andWhere(
                     $query->expr()->like("i.slug", ":slug")
                 )
@@ -73,12 +80,13 @@ class ItemRepository extends ServiceEntityRepository
 
     /**
      * Recherche d'existence
+     * @param User $user
      * @param Store $store
      * @param array $values
      * @param Uuid|null $id
      * @return float|int|mixed|string
      */
-    public function findExistingItems(Store $store, array $values, ?Uuid $id = null)
+    public function findExistingItems(User $user, Store $store, array $values, ?Uuid $id = null): mixed
     {
         $query = $this->createQueryBuilder('i');
 
@@ -127,15 +135,38 @@ class ItemRepository extends ServiceEntityRepository
     /**
      * @throws NonUniqueResultException
      */
+    public function findOneByUserAndSlug(User $user, Store $store, $slug): ?Item
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.store = :store')
+            ->andWhere('i.slug = :slug')
+            ->setParameter('store', $store)
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
     public function findOneBySlug(Store $store, $slug): ?Item
     {
         return $this->createQueryBuilder('i')
             ->andWhere('i.store = :store')
-            ->andWhere('i.slug = :val')
-            ->setParameter('val', $slug)
+            ->andWhere('i.slug = :slug')
             ->setParameter('store', $store)
+            ->setParameter('slug', $slug)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function findByStore(User $user, Store $store): array
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.store = :store')
+            ->setParameter('store', $store)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

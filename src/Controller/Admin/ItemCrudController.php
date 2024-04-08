@@ -84,6 +84,7 @@ class ItemCrudController extends BaseCrudController
             ->add('store')
             ->add('id')
             ->add('slug')
+            ->add('author')
             ->add(JsonFilter::new('values'));
     }
 
@@ -98,7 +99,10 @@ class ItemCrudController extends BaseCrudController
         }
 
         yield TextField::new('slug')
-            ->setColumns(12);
+            ->setColumns(6);
+
+        yield TextField::new('author')
+            ->setColumns(6);
 
         if (Crud::PAGE_INDEX !== $pageName) {
             yield FormField::addFieldset('Values');
