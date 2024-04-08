@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -39,12 +41,13 @@ class User extends OAuthUser
     #[ORM\Column(nullable: true)]
     private ?int $googleExpires = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $data = null;
+    #[ORM\OneToMany(mappedBy: 'member', targetEntity: Authorization::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $authorizations;
 
     public function __construct($username = '', array $roles = ['ROLE_USER'])
     {
         parent::__construct($username, $roles);
+        $this->authorizations = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -64,14 +67,16 @@ class User extends OAuthUser
         return $this;
     }
 
+    public function toJson(): array
+    {
+        return [
+            'username' => $this->getUsername()
+        ];
+    }
+
     public function getUserIdentifier(): string
     {
         return $this->getUsername();
-    }
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
     }
 
     public function getEmail(): ?string
@@ -149,25 +154,84 @@ class User extends OAuthUser
             : null;
     }
 
-    public function toArray()
-    {
-        return [
-            'id'       => $this->id,
-            'email'    => $this->email,
-            'username' => $this->username,
-            'data'     => $this->data,
-        ];
-    }
-
-    public function getData(): ?array
-    {
-        return $this->data;
-    }
-
     public function setData(?array $data): static
     {
         $this->data = $data;
 
         return $this;
+    }
+
+    public function addAuthorization(Authorization $authorization): static
+    {
+        if (!$this->authorizations->contains($authorization)) {
+            $this->authorizations->add($authorization);
+            $authorization->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthorization(Authorization $authorization): static
+    {
+        if ($this->authorizations->removeElement($authorization)) {
+            // set the owning side to null (unless already changed)
+            if ($authorization->getMember() === $this) {
+                $authorization->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function hasAuthorization(Project $project): bool
+    {
+        foreach ($this->getAuthorizations() as $authorization) {
+            if ($authorization->getProject()->getId() === $project->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection<int, Authorization>
+     */
+    public function getAuthorizations(): Collection
+    {
+        return $this->authorizations;
+    }
+
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+
+    public function getAuthorizationProjects(): array
+    {
+        return array_map(static fn(Authorization $auth) => $auth->getProject(), $this->getAuthorizations()->toArray());
+    }
+
+    public function toJsonProfile(Project $project): array
+    {
+        /** @var Authorization $authorization */
+        $authorization = current(
+            array_filter(
+                $this->getAuthorizations()->toArray(),
+                fn($authorization) => $authorization->getProject()->getId() === $project->getId()
+            )
+        );
+
+        return [
+            'id'       => $this->id,
+            'email'    => $this->email,
+            'username' => $this->username,
+            'data'     => $authorization->getData(),
+        ];
+    }
+
+    public function equal(User $user): bool
+    {
+        return $this->getId()->equals($user->getId());
     }
 }

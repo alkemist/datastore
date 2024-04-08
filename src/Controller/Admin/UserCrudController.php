@@ -3,14 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use App\Form\Type\JsonCodeEditorType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
@@ -59,7 +58,10 @@ class UserCrudController extends AbstractCrudController
 
         if (Crud::PAGE_INDEX === $pageName) {
             yield TimeField::new('googleExpiresDiffDate')
-                ->setColumns(3)->setLabel('Token expire');
+                ->setLabel('Token expire');
+
+            yield ArrayField::new('authorizationProjects')
+                ->setLabel('Authorizations');
         }
 
 
@@ -70,9 +72,10 @@ class UserCrudController extends AbstractCrudController
             yield TextField::new('googleRefreshToken')
                 ->setColumns(12);
 
-            yield CodeEditorField::new('data')
-                ->setFormType(JsonCodeEditorType::class)
-                ->setColumns(12);
+            yield CollectionField::new('authorizations')
+                ->setColumns(12)
+                ->renderExpanded()
+                ->useEntryCrudForm();
         }
     }
 }

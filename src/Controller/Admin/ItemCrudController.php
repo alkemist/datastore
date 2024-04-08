@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -33,7 +34,7 @@ class ItemCrudController extends BaseCrudController
             ->setEntityLabelInSingular('Item')
             ->setEntityLabelInPlural('Items')
             ->setDefaultSort(['store' => 'ASC', 'updated' => 'DESC'])
-            ->setSearchFields(['id', 'store.key', 'slug'])
+            ->setSearchFields(['id', 'slug', 'name'])
             ->showEntityActionsInlined(true);
     }
 
@@ -84,6 +85,7 @@ class ItemCrudController extends BaseCrudController
             ->add('store')
             ->add('id')
             ->add('slug')
+            ->add('name')
             ->add('author')
             ->add(JsonFilter::new('values'));
     }
@@ -98,11 +100,17 @@ class ItemCrudController extends BaseCrudController
                 ->setColumns(12);
         }
 
-        yield TextField::new('slug')
-            ->setColumns(6);
+        if (Crud::PAGE_INDEX !== $pageName && Crud::PAGE_NEW !== $pageName) {
+            yield TextField::new('slug')
+                ->setColumns(4)
+                ->setDisabled();
+        }
 
-        yield TextField::new('author')
-            ->setColumns(6);
+        yield TextField::new('name')
+            ->setColumns(4);
+
+        yield AssociationField::new('author')
+            ->setColumns(4);
 
         if (Crud::PAGE_INDEX !== $pageName) {
             yield FormField::addFieldset('Values');

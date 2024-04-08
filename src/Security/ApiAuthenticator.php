@@ -17,7 +17,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
-    private const OAUTH_HEADER_NAME = 'X-AUTH-TOKEN';
+    private const TOKEN_HEADER_KEY = 'X-AUTH-TOKEN';
+    private const PROJECT_HEADER_KEY = 'X-AUTH-PROJECT';
 
     private OauthService $oauthService;
 
@@ -39,16 +40,21 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $apiToken = $request->headers->get(self::OAUTH_HEADER_NAME);
+        $apiToken = $request->headers->get(self::TOKEN_HEADER_KEY);
+        $apiProject = $request->headers->get(self::PROJECT_HEADER_KEY);
 
         if (!$apiToken) {
             throw new CustomUserMessageAuthenticationException('No API token provided');
         }
 
-        $user = $this->oauthService->getUserByToken($apiToken);
+        if (!$apiProject) {
+            throw new CustomUserMessageAuthenticationException('No API project provided');
+        }
+
+        $user = $this->oauthService->getUserByToken($apiProject, $apiToken);
 
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException("Expired token");
+            throw new CustomUserMessageAuthenticationException("Expired token or unauthorized project");
         }
 
         try {

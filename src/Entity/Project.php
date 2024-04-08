@@ -32,9 +32,13 @@ class Project extends ParentEntity
     #[ORM\OrderBy(["key" => "ASC"])]
     private Collection $stores;
 
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Authorization::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $authorizations;
+
     public function __construct()
     {
         $this->stores = new ArrayCollection();
+        $this->authorizations = new ArrayCollection();
     }
 
     public function __serialize(): array
@@ -111,5 +115,40 @@ class Project extends ParentEntity
         }
 
         return $this;
+    }
+
+    public function addAuthorization(Authorization $authorization): static
+    {
+        if (!$this->authorizations->contains($authorization)) {
+            $this->authorizations->add($authorization);
+            $authorization->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthorization(Authorization $authorization): static
+    {
+        if ($this->authorizations->removeElement($authorization)) {
+            // set the owning side to null (unless already changed)
+            if ($authorization->getProject() === $this) {
+                $authorization->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAuthorizationUsers(): array
+    {
+        return array_map(static fn(Authorization $auth) => $auth->getMember(), $this->getAuthorizations()->toArray());
+    }
+
+    /**
+     * @return Collection<int, Authorization>
+     */
+    public function getAuthorizations(): Collection
+    {
+        return $this->authorizations;
     }
 }

@@ -29,12 +29,27 @@ class ApiController extends AbstractController
     ) {
     }
 
-    #[Route(path: '/api/profile', name: 'api_profile', methods: ['GET'])]
-    public function profile(#[CurrentUser] User $user): Response
+    #[Route(path: '/api/profile/{project_key}', name: 'api_profile', methods: ['GET'])]
+    public function profile(#[CurrentUser] User $user, string $project_key): Response
     {
+        $response = $this->buildResponse($user);
+        $project = $this->projectRepository->findOneByKey($project_key);
+
+        if (!$project) {
+            return $response
+                ->isUnprocessableEntity("Unknown projet '$project_key'")
+                ->toJson();
+        }
+
+        // @TODO Faire pareil pour toutes les requètes
+        if (!$user->hasAuthorization($project)) {
+            return $response
+                ->isUnprocessableEntity("No authorization for projet '$project_key'")
+                ->toJson();
+        }
 
         return $this->buildResponse($user)
-            ->setItem($user->toArray())
+            ->setItem($user->toJsonProfile($project))
             ->toJson();
     }
 
@@ -62,6 +77,7 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
+        /** @var Item[] $items */
         $items = $this->itemRepository->findByStore($user, $store);
 
         return $response
@@ -256,7 +272,6 @@ class ApiController extends AbstractController
 
         try {
             $store = $this->getStore($project_key, $store_key);
-            $fields = $store->getFields()->toArray();
         } catch (\Exception $exception) {
             return $response
                 ->isUnprocessableEntity($exception->getMessage())
@@ -354,9 +369,9 @@ class ApiController extends AbstractController
 
         $item = new Item();
 
-        if (!$this->checkSlug($store, $item, $request)) {
+        if (!$this->checkName($store, $item, $request)) {
             return $response
-                ->isUnprocessableEntity("Missing slug")
+                ->isUnprocessableEntity("Missing name")
                 ->toJson();
         }
 
@@ -371,17 +386,17 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
-    private function checkSlug(Store $store, Item $item, Request $request)
+    private function checkName(Store $store, Item $item, Request $request): bool
     {
         $values = $this->filterPostData($request, $store);
 
-        if (!isset($values['slug'])) {
+        if (!isset($values['name'])) {
             return false;
         }
 
-        $item->setSlug($values['slug']);
+        $item->setName($values['name']);
 
-        unset($values['slug']);
+        unset($values['name']);
         unset($values['id']);
 
         $item->setValues($values);
@@ -405,7 +420,7 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        if ($user->getId() !== !$item->getAuthor()->getId()) {
+        if (!$item->getAuthor()->equal($user)) {
             return $response
                 ->isUnprocessableEntity("You are not the author of item '$id'")
                 ->toJson();
@@ -413,9 +428,9 @@ class ApiController extends AbstractController
 
         $store = $item->getStore();
 
-        if (!$this->checkSlug($store, $item, $request)) {
+        if (!$this->checkName($store, $item, $request)) {
             return $response
-                ->isUnprocessableEntity("Missing slug")
+                ->isUnprocessableEntity("Missing name")
                 ->toJson();
         }
 
@@ -442,7 +457,7 @@ class ApiController extends AbstractController
                 ->toJson();
         }
 
-        if ($user->getId() !== !$item->getAuthor()->getId()) {
+        if (!$item->getAuthor()->equal($user)) {
             return $response
                 ->isUnprocessableEntity("You are not the author of item '$id'")
                 ->toJson();

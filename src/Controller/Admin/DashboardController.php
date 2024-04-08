@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Authorization;
 use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\Store;
@@ -80,6 +81,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::section('Access');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
+        yield MenuItem::linkToCrud('Authorizations', 'fas fa-door-open', Authorization::class);
 
 
         yield MenuItem::section('Datastores');

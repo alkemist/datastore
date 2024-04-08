@@ -78,8 +78,8 @@ class OauthService
         $this->entityManager->flush();
     }
 
-    public function getUserByToken($apiToken)
+    public function getUserByToken($apiProject, $apiToken): ?User
     {
-        return $this->userRepository->findOneBy(['googleRefreshToken' => $apiToken]);
+        return $this->userRepository->findOneByProjectAndToken($apiProject, $apiToken);
     }
 }

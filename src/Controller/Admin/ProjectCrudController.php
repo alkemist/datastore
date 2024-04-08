@@ -53,16 +53,23 @@ class ProjectCrudController extends AbstractCrudController
             yield FormField::addFieldset('Stores');
             yield CollectionField::new('stores')
                 ->setRequired(true)
-                ->setFormTypeOption('allow_add', true)
                 ->setFormTypeOption('allow_delete', false)
                 ->setEntryType(StoreType::class)
                 ->setLabel(false)
                 ->setColumns(12);
+
+            yield CollectionField::new('authorizations')
+                ->setColumns(12)
+                ->renderExpanded()
+                ->useEntryCrudForm();
         }
 
         if (Crud::PAGE_INDEX === $pageName) {
             yield ArrayField::new('storeKeys')
                 ->setLabel('Stores');
+
+            yield ArrayField::new('authorizationUsers')
+                ->setLabel('Authorizations');
         }
     }
 }

@@ -37,11 +37,11 @@ class ItemRepository extends ServiceEntityRepository
         $query = $this->createQueryBuilder('i');
 
         foreach ($filters as $field_key => $field_value) {
-            if ($field_key === 'author') {
+            if ($field_key === 'name') {
                 $query->andWhere(
-                    $query->expr()->like("i.author", ":author")
+                    $query->expr()->like("i.name", ":name")
                 )
-                    ->setParameter("author", $field_value);
+                    ->setParameter("name", $field_value);
             } else if ($field_key === 'slug') {
                 $query->andWhere(
                     $query->expr()->like("i.slug", ":slug")
@@ -71,7 +71,9 @@ class ItemRepository extends ServiceEntityRepository
         }
 
         $query->andWhere('i.store = :store')
-            ->setParameter('store', $store);
+            ->andWhere('i.author = :user')
+            ->setParameter('store', $store)
+            ->setParameter('user', $user);
 
         return $query
             ->getQuery()
@@ -91,7 +93,12 @@ class ItemRepository extends ServiceEntityRepository
         $query = $this->createQueryBuilder('i');
 
         foreach ($values as $field_key => $field_value) {
-            if ($field_key === 'slug') {
+            if ($field_key === 'name') {
+                $query->andWhere(
+                    $query->expr()->like("i.name", ":name")
+                )
+                    ->setParameter("name", $field_value);
+            } elseif ($field_key === 'slug') {
                 $query->orWhere(
                     $query->expr()->like("i.slug", ":slug")
                 )
@@ -139,8 +146,10 @@ class ItemRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->andWhere('i.store = :store')
+            ->andWhere('i.author = :user')
             ->andWhere('i.slug = :slug')
             ->setParameter('store', $store)
+            ->setParameter('user', $user)
             ->setParameter('slug', $slug)
             ->getQuery()
             ->getOneOrNullResult();
@@ -164,7 +173,9 @@ class ItemRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->andWhere('i.store = :store')
+            ->andWhere('i.author = :user')
             ->setParameter('store', $store)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }

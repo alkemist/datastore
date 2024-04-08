@@ -30,7 +30,11 @@ class Item
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private Uuid|null $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Gedmo\Slug(fields: ['name'])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'items')]
@@ -49,7 +53,8 @@ class Item
     private ?DateTimeInterface $updated = null;
 
     #[ORM\ManyToOne]
-    private ?User $author = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private User $author;
 
     /**
      * @param Store $store
@@ -59,15 +64,29 @@ class Item
     public function toJson(Store $store): array
     {
         return [
+            ...ItemHelper::formatValues($store->getFields()->toArray(), $this, true),
             'id'   => $this->getId(),
+            'name' => $this->getName(),
             'slug' => $this->getSlug(),
-            ...ItemHelper::formatValues($store->getFields()->toArray(), $this, true)
+            'user' => $this->getAuthor()->toJson(),
         ];
     }
 
     public function getId(): ?Uuid
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getSlug(): ?string
@@ -78,6 +97,18 @@ class Item
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
@@ -170,18 +201,6 @@ class Item
     public function setUpdated(?DateTimeInterface $updated): static
     {
         $this->updated = $updated;
-
-        return $this;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
 
         return $this;
     }

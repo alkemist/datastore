@@ -97,7 +97,6 @@ abstract class ItemHelper
         return match ($type) {
             FieldTypeEnum::Boolean => TypeHelper::boolToString($value),
             FieldTypeEnum::Datetime => TypeHelper::dateToString($value),
-            //FieldTypeEnum::Json => TypeHelper::jsonToString($value),
             FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, 'string'),
             FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, 'int'),
             FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, 'float'),
@@ -116,7 +115,7 @@ abstract class ItemHelper
 
         return array_filter(
             $values,
-            fn($key) => in_array($key, $keys) || ($key === 'id' || $key === 'slug'),
+            fn($key) => in_array($key, $keys) || ($key === 'id' || $key === 'name'),
             ARRAY_FILTER_USE_KEY
         );
     }
