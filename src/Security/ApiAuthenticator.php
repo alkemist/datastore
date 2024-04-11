@@ -82,6 +82,13 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        if ($request->attributes->get('_route') === 'api_profile') {
+            return (new ApiResponse())
+                ->setResponse(strtr($exception->getMessageKey(), $exception->getMessageData()))
+                ->setItem(null)
+                ->toJson();
+        }
+
         return (new ApiResponse())
             ->isUnauthorized(
                 strtr($exception->getMessageKey(), $exception->getMessageData())

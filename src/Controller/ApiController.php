@@ -35,19 +35,6 @@ class ApiController extends AbstractController
         $response = $this->buildResponse($user);
         $project = $this->projectRepository->findOneByKey($project_key);
 
-        if (!$project) {
-            return $response
-                ->isUnprocessableEntity("Unknown projet '$project_key'")
-                ->toJson();
-        }
-
-        // @TODO Faire pareil pour toutes les requètes
-        if (!$user->hasAuthorization($project)) {
-            return $response
-                ->isUnprocessableEntity("No authorization for projet '$project_key'")
-                ->toJson();
-        }
-
         return $this->buildResponse($user)
             ->setItem($user->toJsonProfile($project))
             ->toJson();

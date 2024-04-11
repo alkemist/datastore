@@ -9,7 +9,7 @@ nelmio_cors:
     max_age: 3600
   paths:
     '^/api/':
-      allow_origin: [ '^https://(localhost|127\.0\.0\.1)(:[0-9]+)?$', '^https://([\w+].)?jaden-achain.dev$' ]
+      allow_origin: [ '^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$', '^https://([\w+].)?jaden-achain.dev$' ]
       allow_headers: [ 'X-AUTH-TOKEN', 'X-AUTH-PROJECT', 'Content-type' ]
       allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE' ]
       forced_allow_origin_value: ~

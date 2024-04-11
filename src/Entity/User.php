@@ -226,7 +226,7 @@ class User extends OAuthUser
             'id'       => $this->id,
             'email'    => $this->email,
             'username' => $this->username,
-            'data'     => $authorization->getData(),
+            'data'     => $authorization->getData() ?? [],
         ];
     }
 
