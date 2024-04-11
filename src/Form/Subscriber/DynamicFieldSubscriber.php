@@ -70,6 +70,11 @@ abstract class DynamicFieldSubscriber implements EventSubscriberInterface
                 $form->add($valueField, CollectionType::class, [
                     'label' => $valueLabel, 'required' => false, 'entry_type' => NumberType::class, ...$arrayOptions]);
                 break;
+            case FieldTypeEnum::ArrayObject:
+                $form->add($valueField, CollectionType::class, [
+                                          'label' => $valueLabel, 'required' => false, 'entry_type' => JsonTextareaType::class, ...$arrayOptions]
+                );
+                break;
             default:
                 $form->add($valueField, TextareaType::class, [
                     'label' => $valueLabel, 'required' => false]);

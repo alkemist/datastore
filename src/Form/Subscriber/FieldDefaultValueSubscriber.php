@@ -25,10 +25,12 @@ class FieldDefaultValueSubscriber extends DynamicFieldSubscriber
         ]);
 
         if ($data !== null) {
-            parent::preSetDataWithField(
-                $form, $data, $data->getType(),
-                'formattedDefaultValue', 'default value',
-            );
+            if (!$data->getIsNull()) {
+                parent::preSetDataWithField(
+                    $form, $data, $data->getType(),
+                    'formattedDefaultValue', 'default value',
+                );
+            }
 
             $form->add('isNull', CheckboxType::class, [
                 'label'    => 'Null value',

@@ -84,6 +84,10 @@ abstract class ItemHelper
             FieldTypeEnum::Float => TypeHelper::toFloat($value),
             FieldTypeEnum::Boolean => TypeHelper::toBool($value),
             FieldTypeEnum::Datetime => TypeHelper::toDate($value, $toJson),
+            FieldTypeEnum::ArrayString => TypeHelper::toArray($value, FieldTypeEnum::String),
+            FieldTypeEnum::ArrayInt => TypeHelper::toArray($value, FieldTypeEnum::Int),
+            FieldTypeEnum::ArrayFloat => TypeHelper::toArray($value, FieldTypeEnum::Float),
+            FieldTypeEnum::ArrayObject => TypeHelper::toArray($value, FieldTypeEnum::Json),
             default => $value
         };
     }
@@ -97,9 +101,10 @@ abstract class ItemHelper
         return match ($type) {
             FieldTypeEnum::Boolean => TypeHelper::boolToString($value),
             FieldTypeEnum::Datetime => TypeHelper::dateToString($value),
-            FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, 'string'),
-            FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, 'int'),
-            FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, 'float'),
+            FieldTypeEnum::ArrayString => TypeHelper::arrayToString($value, FieldTypeEnum::String),
+            FieldTypeEnum::ArrayInt => TypeHelper::arrayToString($value, FieldTypeEnum::Int),
+            FieldTypeEnum::ArrayFloat => TypeHelper::arrayToString($value, FieldTypeEnum::Float),
+            FieldTypeEnum::ArrayObject => TypeHelper::arrayToString($value, FieldTypeEnum::Json),
             default => (string)$value
         };
     }

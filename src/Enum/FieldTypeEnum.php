@@ -15,6 +15,7 @@ enum FieldTypeEnum: string
     case ArrayString = 'array_string';
     case ArrayInt = 'array_integer';
     case ArrayFloat = 'array_float';
+    case ArrayObject = 'array_object';
 
     public static function choices(): Traversable
     {
@@ -35,6 +36,7 @@ enum FieldTypeEnum: string
             self::ArrayString => 'ArrayString',
             self::ArrayInt => 'ArrayInt',
             self::ArrayFloat => 'ArrayFloat',
+            self::ArrayObject => 'ArrayObject',
         };
     }
 

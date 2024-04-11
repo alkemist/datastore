@@ -2,6 +2,7 @@
 
 namespace App\Helper;
 
+use App\Enum\FieldTypeEnum;
 use DateTime;
 use DateTimeInterface;
 use Exception;
@@ -38,6 +39,11 @@ abstract class TypeHelper
         return floatval($value);
     }
 
+    static function toArray(mixed $value, FieldTypeEnum $type): array
+    {
+        return $value && is_array($value) ? $value : [];
+    }
+
     /**
      * @throws Exception
      */
@@ -63,7 +69,7 @@ abstract class TypeHelper
         return $value->format(DateTimeInterface::ATOM);
     }
 
-    public static function arrayToString(array|string $value, string $type): string
+    public static function arrayToString(array|string $value, FieldTypeEnum $type): string
     {
         if (!is_array($value)) {
             return $value;

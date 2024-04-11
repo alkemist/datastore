@@ -119,6 +119,8 @@ class Field extends ParentEntity
      */
     public function getFormattedDefaultValue()
     {
+        dump("getFormattedDefaultValue");
+        dump($this->defaultValue);
         return $this->getIsNull() ? null
             : ItemHelper::formatValue($this, $this->defaultValue);
     }
@@ -126,6 +128,23 @@ class Field extends ParentEntity
     public function getIsNull()
     {
         return $this->defaultValue === null;
+    }
+
+    /**
+     * Utilisé par easyAdmin
+     * @param mixed $formattedDefaultValue
+     * @return void
+     */
+    public function setFormattedDefaultValue(mixed $formattedDefaultValue)
+    {
+        $this->valueChanged = true;
+        dump($formattedDefaultValue);
+        $this->defaultValue = $formattedDefaultValue;
+        /*$this->defaultValue =
+            ItemHelper::toString(
+                $formattedDefaultValue,
+                $this->getType()
+            );*/
     }
 
     public function setIsNull(bool $isNull)
@@ -145,16 +164,6 @@ class Field extends ParentEntity
         $this->defaultValue = $defaultValue;
 
         return $this;
-    }
-
-    public function setFormattedDefaultValue(mixed $formattedDefaultValue)
-    {
-        $this->valueChanged = true;
-        $this->defaultValue =
-            ItemHelper::toString(
-                $formattedDefaultValue,
-                $this->getType()
-            );
     }
 
     public function getStore(): ?Store
