@@ -67,6 +67,11 @@ class User extends OAuthUser
         return $this;
     }
 
+    public function getDisplayName(): string
+    {
+        return $this->getUsername();
+    }
+
     public function toJson(): array
     {
         return [

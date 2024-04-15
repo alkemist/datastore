@@ -46,6 +46,14 @@ security:
     - { path: ^/login,  roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
     - { path: ^/, roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
 
+when@dev:
+  security:
+    firewalls:
+      app:
+        webauthn:
+          secured_rp_ids:
+            - 'localhost'
+
 when@test:
   security:
     password_hashers:

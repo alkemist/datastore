@@ -26,10 +26,8 @@ yarn-error.log
 ###> data ###
 /public/upload/
 /data/
-/data/statements/
-/data/consumptions/
-/data/dump/
-/tmp/
+/data/images/
+!/data/images/.gitignore
 ###< data ###
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem

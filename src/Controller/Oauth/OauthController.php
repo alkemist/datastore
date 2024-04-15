@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class OauthController extends AbstractController
 {
-    const ROUTE_LOGIN = 'login_google';
-    const ROUTE_LOGGED = 'logged_google';
-
     public function __construct(
         protected OauthService $oauthService,
     ) {

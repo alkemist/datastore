@@ -7,6 +7,7 @@ use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\Store;
 use App\Entity\User;
+use App\Entity\WebauthnCredential;
 use App\Repository\ProjectRepository;
 use App\Repository\StoreRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -81,6 +82,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::section('Access');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
+        yield MenuItem::linkToCrud('Webauthn Credentials', 'fas fa-user', WebauthnCredential::class);
         yield MenuItem::linkToCrud('Authorizations', 'fas fa-door-open', Authorization::class);
 
 
