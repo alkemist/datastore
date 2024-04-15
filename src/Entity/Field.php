@@ -119,8 +119,6 @@ class Field extends ParentEntity
      */
     public function getFormattedDefaultValue()
     {
-        dump("getFormattedDefaultValue");
-        dump($this->defaultValue);
         return $this->getIsNull() ? null
             : ItemHelper::formatValue($this, $this->defaultValue);
     }
@@ -138,7 +136,6 @@ class Field extends ParentEntity
     public function setFormattedDefaultValue(mixed $formattedDefaultValue)
     {
         $this->valueChanged = true;
-        dump($formattedDefaultValue);
         $this->defaultValue = $formattedDefaultValue;
         /*$this->defaultValue =
             ItemHelper::toString(

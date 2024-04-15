@@ -30,6 +30,6 @@ return [
         'version' => '7.4.0',
     ],
     '@symfony/stimulus-bundle' => [
-        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
+        'path' => '@symfony/stimulus-bundle/loader.js',
     ],
 ];

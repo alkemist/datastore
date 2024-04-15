@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
@@ -47,6 +48,7 @@ class OauthService
             $user->setRoles(['ROLE_ADMIN']);
         }
 
+        $user->updateToken();
         $user->setGoogleId($googleUser->getId());
         $user->setGoogleRefreshToken($refreshToken);
         $user->setGoogleExpires($expires);
@@ -63,6 +65,7 @@ class OauthService
             $client = $this->clientRegistry->getClient('google_main');
             $accessToken = $client->refreshAccessToken($user->getGoogleRefreshToken());
 
+            $user->updateToken();
             $user->setGoogleRefreshToken($accessToken->getToken());
             $user->setGoogleExpires($accessToken->getExpires());
             $this->entityManager->flush();
@@ -75,9 +78,13 @@ class OauthService
     {
         $user->setGoogleRefreshToken(null);
         $user->setGoogleExpires(null);
+        $user->setTokenExpires(null);
         $this->entityManager->flush();
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function getUserByToken($apiProject, $apiToken): ?User
     {
         return $this->userRepository->findOneByProjectAndToken($apiProject, $apiToken);

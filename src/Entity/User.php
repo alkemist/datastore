@@ -23,10 +23,10 @@ class User extends OAuthUser
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private Uuid|null $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $username = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(type: Types::JSON)]
@@ -43,6 +43,12 @@ class User extends OAuthUser
 
     #[ORM\OneToMany(mappedBy: 'member', targetEntity: Authorization::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $authorizations;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $token = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $tokenExpires = null;
 
     public function __construct($username = '', array $roles = ['ROLE_USER'])
     {
@@ -67,9 +73,16 @@ class User extends OAuthUser
         return $this;
     }
 
-    public function getDisplayName(): string
+    public function getEmail(): ?string
     {
-        return $this->getUsername();
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
     }
 
     public function toJson(): array
@@ -82,18 +95,6 @@ class User extends OAuthUser
     public function getUserIdentifier(): string
     {
         return $this->getUsername();
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     public function getRoles(): array
@@ -122,7 +123,31 @@ class User extends OAuthUser
 
     public function isExpired(): bool
     {
-        return !$this->getGoogleRefreshToken() || $this->getGoogleExpires() < time();
+        return !$this->getToken() || $this->getTokenExpires() < time();
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken($token = ''): static
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getTokenExpires(): ?int
+    {
+        return $this->tokenExpires;
+    }
+
+    public function setTokenExpires(?int $tokenExpires): static
+    {
+        $this->tokenExpires = $tokenExpires;
+
+        return $this;
     }
 
     public function getGoogleRefreshToken(): ?string
@@ -152,18 +177,11 @@ class User extends OAuthUser
     /**
      * @throws Exception
      */
-    public function getGoogleExpiresDiffDate(): ?DateTime
+    public function getTokenExpiresDiffDate(): ?DateTime
     {
-        return $this->googleExpires > time()
-            ? DateTime::createFromFormat('U', $this->googleExpires - time())
+        return $this->tokenExpires > time()
+            ? DateTime::createFromFormat('U', $this->tokenExpires - time())
             : null;
-    }
-
-    public function setData(?array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
     }
 
     public function addAuthorization(Authorization $authorization): static
@@ -238,5 +256,13 @@ class User extends OAuthUser
     public function equal(User $user): bool
     {
         return $this->getId()->equals($user->getId());
+    }
+
+    public function updateToken(): static
+    {
+        $this->token = Uuid::v7()->jsonSerialize();
+        $this->tokenExpires = time() + 3600;
+
+        return $this;
     }
 }

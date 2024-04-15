@@ -11,8 +11,9 @@ use Webauthn\PublicKeyCredentialSource;
 
 final class WebauthnCredentialRepository extends DoctrineCredentialSourceRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+    ) {
         parent::__construct($registry, WebauthnCredential::class);
     }
 

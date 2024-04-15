@@ -18,7 +18,7 @@ class ApiResponse extends ArrayObject
 
     function setToken(User $user): static
     {
-        $this->offsetSet('token', $user->getGoogleRefreshToken());
+        $this->offsetSet('token', $user->getToken());
         return $this;
     }
 

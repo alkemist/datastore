@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Authorization;
+use App\Entity\Company;
 use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\Store;
@@ -19,14 +20,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-        private StoreRepository   $storeRepository,
-        private ProjectRepository $projectRepository,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
+        private StoreRepository            $storeRepository,
+        private ProjectRepository          $projectRepository,
     ) {
     }
 
@@ -82,7 +85,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::section('Access');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
-        yield MenuItem::linkToCrud('Webauthn Credentials', 'fas fa-user', WebauthnCredential::class);
+        yield MenuItem::linkToCrud('Keys', 'fas fa-user', WebauthnCredential::class);
         yield MenuItem::linkToCrud('Authorizations', 'fas fa-door-open', Authorization::class);
 
 
@@ -107,5 +110,15 @@ class DashboardController extends AbstractDashboardController
 
             }
         }
+    }
+
+    #[Route('/admin/register', name: 'admin_register')]
+    public function report(Request $request): Response
+    {
+        return $this->render('admin/register.html.twig', [
+            'creationSuccessRedirectUri' => $this->adminUrlGenerator
+                ->setController(WebauthnCredentialCrudController::class)
+                ->generateUrl()
+        ]);
     }
 }

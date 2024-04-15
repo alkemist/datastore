@@ -19,4 +19,7 @@ return [
     Vich\UploaderBundle\VichUploaderBundle::class                     => ['all' => true],
     Webauthn\Bundle\WebauthnBundle::class                             => ['all' => true],
     Webauthn\Stimulus\WebauthnStimulusBundle::class                   => ['all' => true],
+    Symfony\UX\TwigComponent\TwigComponentBundle::class               => ['all' => true],
+    Symfony\UX\StimulusBundle\StimulusBundle::class                   => ['all' => true],
+    Symfony\UX\Chartjs\ChartjsBundle::class                           => ['all' => true],
 ];

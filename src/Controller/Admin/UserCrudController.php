@@ -57,7 +57,7 @@ class UserCrudController extends AbstractCrudController
             ->setColumns(3);
 
         if (Crud::PAGE_INDEX === $pageName) {
-            yield TimeField::new('googleExpiresDiffDate')
+            yield TimeField::new('tokenExpiresDiffDate')
                 ->setLabel('Token expire');
 
             yield ArrayField::new('authorizationProjects')
@@ -70,6 +70,9 @@ class UserCrudController extends AbstractCrudController
                 ->setColumns(4);
 
             yield TextField::new('googleRefreshToken')
+                ->setColumns(12);
+
+            yield TextField::new('token')
                 ->setColumns(12);
 
             yield CollectionField::new('authorizations')

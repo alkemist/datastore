@@ -6,32 +6,22 @@
 
 {%- endblock -%}
 
-{% block stylesheets %}
-
-{% endblock %}
-
-{% block javascripts %}
-
-{% endblock %}
-
 {% block body %}
+    <a href="{{ path('login_google', {callback : googleCallback}) }}">Google</a>
     <form
             {{ stimulus_controller('@web-auth/webauthn-stimulus',
                 {
-                    requestResultUrl: path('webauthn.controller.security.main.request.result'),
-                    requestOptionsUrl: path('webauthn.controller.security.main.request.options')
+                    requestResultUrl: path('webauthn.controller.request.response.login'),
+                    requestOptionsUrl: path('webauthn.controller.request.request.login'),
+                    requestSuccessRedirectUri: webauthnCallback
                 }
             ) }}
     >
-        <label for="username">Username</label>
-        <input name="username" type="text" id="username" placeholder="Type your username here"
-               autocomplete="username webauthn">
-
         <button
                 type="submit"
                 {{ stimulus_action('@web-auth/webauthn-stimulus', 'signin') }}
         >
-            Sign in
+            Webauth Key
         </button>
     </form>
 {% endblock %}

@@ -15,7 +15,6 @@
     "easycorp/easyadmin-bundle": "^4.6",
     "grizzlyware/yubikey-php": "^1.0",
     "gumlet/php-image-resize": "^2.0",
-    "karser/karser-recaptcha3-bundle": "^0.1.22",
     "knpuniversity/oauth2-client-bundle": "^2.18",
     "konekt/pdf-invoice": "^1.12",
     "league/oauth2-google": "*",
@@ -49,15 +48,15 @@
     "symfony/runtime": "*",
     "symfony/security-bundle": "7.0.*",
     "symfony/serializer": "7.0.*",
-    "symfony/stimulus-bundle": "*",
+    "symfony/stimulus-bundle": "^2.16",
     "symfony/string": "7.0.*",
     "symfony/translation": "7.0.*",
     "symfony/twig-bundle": "7.0.*",
     "symfony/uid": "7.0.*",
     "symfony/ux-chartjs": "^2.10",
+    "symfony/ux-twig-component": "^2.16",
     "symfony/validator": "7.0.*",
     "symfony/web-link": "7.0.*",
-    "symfony/webpack-encore-bundle": "^2.0",
     "symfony/yaml": "*",
     "symfonycasts/sass-bundle": "^0.5.1",
     "twig/extra-bundle": "^2.12|^3.0",
@@ -103,7 +102,8 @@
     "crud": "bin/console make:admin:crud",
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
-      "assets:install %PUBLIC_DIR%": "symfony-cmd"
+      "assets:install %PUBLIC_DIR%": "symfony-cmd",
+      "importmap:install": "symfony-cmd"
     },
     "post-install-cmd": [
       "@auto-scripts"

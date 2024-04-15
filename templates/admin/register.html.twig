@@ -1,0 +1,40 @@
+{% set active_route = 'report' %}
+{% set active_params = app.request.attributes.get('_route_params') | default([]) %}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+
+{% block body_javascript %}
+    {{ importmap() }}
+{% endblock %}
+
+{% block content_title %}
+    {{ 'Register' | trans }}
+{% endblock %}
+
+{% block page_actions %}
+    {# {% if invoices | length > 0 %}
+        {% for invoice in invoices %}
+            <a class="btn btn-primary" href="{{ ea_url()
+                .setController('App\\Controller\\Admin\\InvoiceCrudController')
+                .setAction('edit')
+                .setEntityId(invoice.id) }}">
+                {{ 'Invoice' | trans }} {{ invoice.company }} - {{ invoice }}
+            </a>
+        {% endfor %}
+    {% endif %}
+    #}
+{% endblock %}
+
+{% block main %}
+    <form {{ stimulus_controller('@web-auth/webauthn-stimulus',
+        {
+            creationResultUrl: path('webauthn.controller.creation.response.from_user_account'),
+            creationOptionsUrl: path('webauthn.controller.creation.request.from_user_account'),
+            creationSuccessRedirectUri
+        }
+    ) }}>
+        <button type="submit" {{ stimulus_action('@web-auth/webauthn-stimulus', 'signup') }}>
+            Add key
+        </button>
+    </form>
+{% endblock %}

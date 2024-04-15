@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class IndexController extends AbstractController
 {
-    #[Route(path: '/', name: 'app_index')]
+    #[Route(path: '/', name: 'index')]
     public function index(#[CurrentUser] ?User $user): Response
     {
         return $this->render('page/index.html.twig', []);

@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
-use Symfony\Component\Uid\Uuid;
-use Webauthn\Bundle\Repository\CanRegisterUserEntity;
+use Doctrine\ORM\EntityManagerInterface;
 use Webauthn\Bundle\Repository\PublicKeyCredentialUserEntityRepositoryInterface;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialUserEntity;
 
-final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntityRepositoryInterface,
-    CanRegisterUserEntity, CanGenerateUserEntity
+final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntityRepositoryInterface
 {
     /**
      * The UserRepository $userRepository is the repository
      * that already exists in the application
      */
-    public function __construct(private readonly UserRepository $userRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserRepository         $userRepository
+    ) {
     }
 
     /**
@@ -39,16 +39,19 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
      * Converts a Symfony User (if any) into a Webauthn User Entity
      * @throws InvalidDataException
      */
-    private function getUserEntity(null|User $user): ?PublicKeyCredentialUserEntity
+    public function getUserEntity(null|User $user): ?PublicKeyCredentialUserEntity
     {
         if ($user === null) {
             return null;
         }
 
+        $user->updateToken();
+        $this->entityManager->flush();
+
         return new PublicKeyCredentialUserEntity(
+            $user->getEmail(),
+            $user->getEmail(),
             $user->getUsername(),
-            $user->getUserIdentifier(),
-            $user->getDisplayName(),
             null
         );
     }
@@ -60,23 +63,9 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
     {
         /** @var User|null $user */
         $user = $this->userRepository->findOneBy([
-                                                     'id' => $userHandle,
+                                                     'email' => $userHandle,
                                                  ]);
 
         return $this->getUserEntity($user);
-    }
-
-    public function generateNextUserEntityId(): string
-    {
-        // TODO: Implement generateNextUserEntityId() method.
-        return Uuid::v7()->jsonSerialize();
-    }
-
-    public function saveUserEntity(PublicKeyCredentialUserEntity $userEntity): void
-    {
-        dump('saveUserEntity');
-        dump($userEntity);
-        exit;
-        // TODO: Implement saveUserEntity() method.
     }
 }

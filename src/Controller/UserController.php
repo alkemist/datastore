@@ -2,29 +2,50 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\Oauth\OauthController;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-class UserController extends AbstractController
+class UserController extends OauthController
 {
     #[Route('/login', name: 'login')]
-    public function login()
-    {
-        return $this->render('page/login.html.twig', [
+    public function login(Request $request, Security $security
+    ): RedirectResponse|Response {
+        $callback = $request->query->get('callback');
 
+        if (!$callback) {
+            $callback = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
+        /*if ($security->getUser()) {
+            return $this->redirect($callback);
+        }*/
+
+        return $this->render('page/login.html.twig', [
+            'googleCallback'   => $callback,
+            'webauthnCallback' => $this->generateUrl('logged', [
+                'callback' => $callback
+            ],                                       UrlGeneratorInterface::ABSOLUTE_URL)
         ]);
+    }
+
+    #[Route('/logged', name: 'logged')]
+    public function logged(Request $request, #[CurrentUser] User $user): RedirectResponse
+    {
+        $callback = $request->query->get('callback');
+
+        return $this->redirectLogged($user, $callback);
     }
 
     #[Route(path: '/logout', name: 'logout')]
     public function logout()
     {
 
-    }
-
-    #[Route(path: '/logged', name: 'logged')]
-    public function logged(): Response
-    {
-        return $this->render('page/popup.html.twig', []);
     }
 }

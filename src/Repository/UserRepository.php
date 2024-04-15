@@ -31,7 +31,7 @@ class UserRepository extends ServiceEntityRepository
             ->join('u.authorizations', 'a')
             ->join('a.project', 'p')
             ->andWhere('p.key = :project')
-            ->andWhere('u.googleRefreshToken = :token')
+            ->andWhere('u.token = :token')
             ->setParameter('project', $project_key)
             ->setParameter('token', $token)
             ->getQuery()

@@ -1,20 +1,20 @@
 webauthn:
   #    logger: null # PSR-3 compatible logging service
-  credential_repository: App\Repository\WebauthnCredentialRepository # CREATE YOUR REPOSITORY AND CHANGE THIS!
-  user_repository: 'Webauthn\Bundle\Repository\DummyPublicKeyCredentialUserEntityRepository' # CREATE YOUR REPOSITORY AND CHANGE THIS!
+  credential_repository: App\Repository\WebauthnCredentialRepository
+  user_repository: App\Repository\WebauthnUserEntityRepository
   token_binding_support_handler: 'Webauthn\TokenBinding\IgnoreTokenBindingHandler' # We ignore the token binding instructions by default
   creation_profiles: # Authenticator registration profiles
     default: # Unique name of the profile
       rp: # Relying Party information
         name: '%env(APP_PARTY_NAME)%' # CHANGE THIS! or create the corresponding env variable
         id: '%env(APP_PARTY_ID)%' # Please adapt the env file with the correct relying party ID or set null
-  #                icon: null # Secured image (data:// scheme)
-  #            challenge_length: 32
-  #            timeout: 60000
-  #            authenticator_selection_criteria:
-  #                attachment_mode: !php/const Webauthn\AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE
-  #                require_resident_key: false
-  #                user_verification: !php/const Webauthn\AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED
+      #                icon: null # Secured image (data:// scheme)
+      #            challenge_length: 32
+      #            timeout: 60000
+      authenticator_selection_criteria:
+        #attachment_mode: !php/const Webauthn\AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE
+        #require_resident_key: true
+        user_verification: !php/const Webauthn\AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED
   #            extensions:
   #                loc: true
   #            public_key_credential_parameters: # You should not change this list
@@ -33,13 +33,25 @@ webauthn:
   request_profiles: # Authentication profiles
     default: # Unique name of the profile
       rp_id: '%env(APP_PARTY_ID)%' # Please adapt the env file with the correct relying party ID or set null
-#            challenge_length: 32
-#            timeout: 60000
-#            user_verification: !php/const Webauthn\AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED
-#            extensions:
-#                loc: true
-#    metadata:
-#        enabled: false
-#        mds_repository: 'App\Repository\MetadataStatementRepository'
-#        status_report_repository: 'App\Repository\StatusReportRepository'
-#        certificate_chain_checker: 'App\Security\CertificateChainChecker'
+      #            challenge_length: 32
+      #            timeout: 60000
+      # user_verification: !php/const Webauthn\AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED
+  #            extensions:
+  #                loc: true
+  #    metadata:
+  #        enabled: false
+  #        mds_repository: 'App\Repository\MetadataStatementRepository'
+  #        status_report_repository: 'App\Repository\StatusReportRepository'
+  #        certificate_chain_checker: 'App\Security\CertificateChainChecker'
+  controllers:
+    enabled: true
+    creation:
+      from_user_account:
+        options_path: '/admin/register/webauthn/options'
+        result_path: '/admin/register/webauthn'
+        user_entity_guesser: Webauthn\Bundle\Security\Guesser\CurrentUserEntityGuesser
+    request:
+      login:
+        options_path: '/login/webauthn/options'
+        result_path: '/login/webauthn'
+
