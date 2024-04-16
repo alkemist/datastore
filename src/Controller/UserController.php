@@ -18,14 +18,13 @@ class UserController extends OauthController
     public function login(Request $request, Security $security
     ): RedirectResponse|Response {
         $callback = $request->query->get('callback');
+        /** @var User|null $user */
+        $user = $security->getUser();
 
-        if (!$callback) {
-            $callback = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        if ($user) {
+            return $this->redirectLogged($user, $callback);
         }
-
-        /*if ($security->getUser()) {
-            return $this->redirect($callback);
-        }*/
 
         return $this->render('page/login.html.twig', [
             'googleCallback'   => $callback,
@@ -38,9 +37,7 @@ class UserController extends OauthController
     #[Route('/logged', name: 'logged')]
     public function logged(Request $request, #[CurrentUser] User $user): RedirectResponse
     {
-        $callback = $request->query->get('callback');
-
-        return $this->redirectLogged($user, $callback);
+        return $this->redirectLogged($user, $request->query->get('callback'));
     }
 
     #[Route(path: '/logout', name: 'logout')]

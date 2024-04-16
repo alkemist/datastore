@@ -2,7 +2,6 @@ webauthn:
   #    logger: null # PSR-3 compatible logging service
   credential_repository: App\Repository\WebauthnCredentialRepository
   user_repository: App\Repository\WebauthnUserEntityRepository
-  token_binding_support_handler: 'Webauthn\TokenBinding\IgnoreTokenBindingHandler' # We ignore the token binding instructions by default
   creation_profiles: # Authenticator registration profiles
     default: # Unique name of the profile
       rp: # Relying Party information

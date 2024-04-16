@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Model\ApiResponse;
 use App\Service\OauthService;
+use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,30 +39,47 @@ class ApiAuthenticator extends AbstractAuthenticator
         return !str_starts_with($request->attributes->get('_route'), 'api_public_');
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function authenticate(Request $request): Passport
     {
         $apiToken = $request->headers->get(self::TOKEN_HEADER_KEY);
         $apiProject = $request->headers->get(self::PROJECT_HEADER_KEY);
 
         if (!$apiToken) {
-            throw new CustomUserMessageAuthenticationException('No API token provided');
+            throw new CustomUserMessageAuthenticationException('No API token provided', [], 200);
         }
 
         if (!$apiProject) {
-            throw new CustomUserMessageAuthenticationException('No API project provided');
+            throw new CustomUserMessageAuthenticationException('No API project provided', [], 200);
         }
 
-        $user = $this->oauthService->getUserByToken($apiProject, $apiToken);
+        $user = $this->oauthService->getUserByToken($apiToken);
 
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException("Expired token or unauthorized project");
+            throw new CustomUserMessageAuthenticationException(
+                "Expired token",
+                [],
+                200
+            );
+        }
+
+        if (!$user->hasAuthorization($apiProject)) {
+            throw new CustomUserMessageAuthenticationException(
+                "Unauthorized project",
+                [],
+                403
+            );
         }
 
         try {
             $this->oauthService->refreshUser($user);
         } catch (Exception $exception) {
             throw new CustomUserMessageAuthenticationException(
-                $exception->getMessage()
+                $exception->getMessage(),
+                [],
+                200
             );
         }
 
@@ -82,16 +100,19 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        if ($request->attributes->get('_route') === 'api_profile') {
+        if ($request->attributes->get('_route') === 'api_profile' && $exception->getCode() !== 403) {
             return (new ApiResponse())
-                ->setResponse(strtr($exception->getMessageKey(), $exception->getMessageData()))
+                ->setResponse(
+                    strtr($exception->getMessageKey(), $exception->getMessageData())
+                )
                 ->setItem(null)
                 ->toJson();
         }
 
         return (new ApiResponse())
             ->isUnauthorized(
-                strtr($exception->getMessageKey(), $exception->getMessageData())
+                strtr($exception->getMessageKey(), $exception->getMessageData()),
+                $exception->getCode()
             )
             ->toJson();
     }

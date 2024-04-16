@@ -6,3 +6,8 @@ framework:
     excluded_patterns:
       - '*/assets/styles/_*.scss'
       - '*/assets/styles/**/_*.scss'
+
+symfonycasts_sass:
+  root_sass:
+    - '%kernel.project_dir%/assets/styles/app.scss'
+    - '%kernel.project_dir%/assets/styles/login.scss'

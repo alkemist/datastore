@@ -57,7 +57,9 @@ class ProjectCrudController extends AbstractCrudController
                 ->setEntryType(StoreType::class)
                 ->setLabel(false)
                 ->setColumns(12);
+        }
 
+        if (Crud::PAGE_EDIT === $pageName) {
             yield CollectionField::new('authorizations')
                 ->setColumns(12)
                 ->renderExpanded()

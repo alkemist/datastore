@@ -58,9 +58,9 @@ class ApiResponse extends ArrayObject
         return $this;
     }
 
-    function isUnauthorized($error): static
+    function isUnauthorized($error, ?int $code = null): static
     {
-        $this->status = Response::HTTP_FORBIDDEN;
+        $this->status = $code !== null && $code > 0 ? $code : Response::HTTP_FORBIDDEN;
         $this->setMessage($error);
         return $this;
     }

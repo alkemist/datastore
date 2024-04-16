@@ -11,10 +11,12 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use League\OAuth2\Client\Provider\GoogleUser;
 use League\OAuth2\Client\Token\AccessToken;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class OauthService
 {
     public function __construct(
+        private KernelInterface        $kernel,
         private ClientRegistry         $clientRegistry,
         private EntityManagerInterface $entityManager,
         private UserRepository         $userRepository,
@@ -40,6 +42,10 @@ class OauthService
 
             if (count($users) > 0) {
                 throw new Exception("User '$email' not exist");
+            }
+
+            if ($this->kernel->getEnvironment() !== 'dev') {
+                throw new Exception("Application not initialized");
             }
 
             $user = new User();
@@ -85,8 +91,8 @@ class OauthService
     /**
      * @throws NonUniqueResultException
      */
-    public function getUserByToken($apiProject, $apiToken): ?User
+    public function getUserByToken($apiToken): ?User
     {
-        return $this->userRepository->findOneByProjectAndToken($apiProject, $apiToken);
+        return $this->userRepository->findOneByToken($apiToken);
     }
 }

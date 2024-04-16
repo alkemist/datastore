@@ -17,5 +17,7 @@
 {% endblock %}
 
 {% block body %}
-    Body
+    {% if user %}
+        {{ user.getUsername() }} : You are logged
+    {% endif %}
 {% endblock %}

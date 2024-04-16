@@ -1,0 +1,47 @@
+html, body, form {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: stretch;
+  align-content: stretch;
+
+  padding: 10px;
+
+
+  .action-button {
+    display: block;
+    font-weight: bold;
+
+    padding: 20px;
+    margin: 10px;
+
+    font-size: 1em;
+    font-family: sans-serif;
+    color: rgb(31, 31, 31);
+    border: 1px solid #c4c7c5;
+
+    &:hover {
+      background-color: rgb(240, 244, 249);
+    }
+  }
+
+  a {
+    text-align: center;
+
+    &, &:visited, &:focus {
+      text-decoration: none;
+    }
+  }
+
+  button {
+    background: transparent;
+    cursor: pointer;
+  }
+}

@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "97f20e95d20f9138d0c7bed468647e8c",
+  "content-hash": "2ad013e014f9d0b71a3eb535ecf3cc68",
   "packages": [
     {
       "name": "behat/transliterator",
@@ -1969,58 +1969,6 @@
       "time": "2024-02-12T15:17:22+00:00"
     },
     {
-      "name": "google/recaptcha",
-      "version": "1.3.0",
-      "source": {
-        "type": "git",
-        "url": "https://github.com/google/recaptcha.git",
-        "reference": "d59a801e98a4e9174814a6d71bbc268dff1202df"
-      },
-      "dist": {
-        "type": "zip",
-        "url": "https://api.github.com/repos/google/recaptcha/zipball/d59a801e98a4e9174814a6d71bbc268dff1202df",
-        "reference": "d59a801e98a4e9174814a6d71bbc268dff1202df",
-        "shasum": ""
-      },
-      "require": {
-        "php": ">=8"
-      },
-      "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.14",
-        "php-coveralls/php-coveralls": "^2.5",
-        "phpunit/phpunit": "^10"
-      },
-      "type": "library",
-      "extra": {
-        "branch-alias": {
-          "dev-master": "1.3.x-dev"
-        }
-      },
-      "autoload": {
-        "psr-4": {
-          "ReCaptcha\\": "src/ReCaptcha"
-        }
-      },
-      "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
-      "description": "Client library for reCAPTCHA, a free service that protects websites from spam and abuse.",
-      "homepage": "https://www.google.com/recaptcha/",
-      "keywords": [
-        "Abuse",
-        "captcha",
-        "recaptcha",
-        "spam"
-      ],
-      "support": {
-        "forum": "https://groups.google.com/forum/#!forum/recaptcha",
-        "issues": "https://github.com/google/recaptcha/issues",
-        "source": "https://github.com/google/recaptcha"
-      },
-      "time": "2023-02-18T17:41:46+00:00"
-    },
-    {
       "name": "grizzlyware/yubikey-php",
       "version": "1.0.2",
       "source": {
@@ -2512,88 +2460,6 @@
         "source": "https://github.com/schmittjoh/metadata/tree/2.8.0"
       },
       "time": "2023-02-15T13:44:18+00:00"
-    },
-    {
-      "name": "karser/karser-recaptcha3-bundle",
-      "version": "v0.1.26",
-      "source": {
-        "type": "git",
-        "url": "https://github.com/karser/KarserRecaptcha3Bundle.git",
-        "reference": "723f21569d4324a1dc070139019675c9c40a8f3c"
-      },
-      "dist": {
-        "type": "zip",
-        "url": "https://api.github.com/repos/karser/KarserRecaptcha3Bundle/zipball/723f21569d4324a1dc070139019675c9c40a8f3c",
-        "reference": "723f21569d4324a1dc070139019675c9c40a8f3c",
-        "shasum": ""
-      },
-      "require": {
-        "google/recaptcha": "^1.2",
-        "php": ">=7.1",
-        "symfony/expression-language": "^3.4|^4.0|^5.0|^6.0|^7.0",
-        "symfony/form": "^3.4|^4.0|^5.0|^6.0|^7.0",
-        "symfony/framework-bundle": "^3.4.26|^4.2.7|^5.0|^6.0|^7.0",
-        "symfony/twig-bundle": "^3.4|^4.0|^5.0|^6.0|^7.0",
-        "symfony/validator": "^3.4|^4.0|^5.0|^6.0|^7.0",
-        "symfony/yaml": "^3.4|^4.0|^5.0|^6.0|^7.0",
-        "twig/twig": "^2.9|^3.0"
-      },
-      "require-dev": {
-        "phpunit/phpunit": "^7|^8|^9|^10",
-        "symfony/http-client": "^4.3|^5.0|^6.0|^7.0"
-      },
-      "type": "symfony-bundle",
-      "extra": {
-        "branch-alias": {
-          "dev-master": "0.1.x-dev"
-        }
-      },
-      "autoload": {
-        "psr-4": {
-          "Karser\\Recaptcha3Bundle\\": ""
-        }
-      },
-      "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
-      "authors": [
-        {
-          "name": "Dmitrii Poddubnyi",
-          "homepage": "https://github.com/karser"
-        }
-      ],
-      "description": "Google ReCAPTCHA v3 for Symfony",
-      "homepage": "http://github.com/karser/KarserRecaptcha3Bundle",
-      "keywords": [
-        "Forms",
-        "Google ReCaptcha",
-        "GoogleReCaptcha",
-        "Symfony Google ReCaptcha",
-        "anti-bot",
-        "anti-bots",
-        "anti-spam",
-        "captcha",
-        "contact",
-        "google",
-        "google recaptcha v3",
-        "no-captcha",
-        "recaptcha",
-        "recaptcha v3",
-        "recaptcha v3 symfony",
-        "security",
-        "spam",
-        "symfony",
-        "symfony google recaptcha v3",
-        "symfony recaptcha",
-        "symfony recaptcha v3",
-        "validation"
-      ],
-      "support": {
-        "issues": "https://github.com/karser/KarserRecaptcha3Bundle/issues",
-        "source": "https://github.com/karser/KarserRecaptcha3Bundle/tree/v0.1.26"
-      },
-      "time": "2024-01-09T09:13:40+00:00"
     },
     {
       "name": "knpuniversity/oauth2-client-bundle",
@@ -10216,77 +10082,6 @@
       "time": "2024-01-23T15:02:46+00:00"
     },
     {
-      "name": "symfony/webpack-encore-bundle",
-      "version": "v2.1.1",
-      "source": {
-        "type": "git",
-        "url": "https://github.com/symfony/webpack-encore-bundle.git",
-        "reference": "75cb918df3f65e28cf0d4bc03042bc45ccb19dd0"
-      },
-      "dist": {
-        "type": "zip",
-        "url": "https://api.github.com/repos/symfony/webpack-encore-bundle/zipball/75cb918df3f65e28cf0d4bc03042bc45ccb19dd0",
-        "reference": "75cb918df3f65e28cf0d4bc03042bc45ccb19dd0",
-        "shasum": ""
-      },
-      "require": {
-        "php": ">=8.1.0",
-        "symfony/asset": "^5.4 || ^6.2 || ^7.0",
-        "symfony/config": "^5.4 || ^6.2 || ^7.0",
-        "symfony/dependency-injection": "^5.4 || ^6.2 || ^7.0",
-        "symfony/http-kernel": "^5.4 || ^6.2 || ^7.0",
-        "symfony/service-contracts": "^1.1.9 || ^2.1.3 || ^3.0"
-      },
-      "require-dev": {
-        "symfony/framework-bundle": "^5.4 || ^6.2 || ^7.0",
-        "symfony/phpunit-bridge": "^5.4 || ^6.2 || ^7.0",
-        "symfony/twig-bundle": "^5.4 || ^6.2 || ^7.0",
-        "symfony/web-link": "^5.4 || ^6.2 || ^7.0"
-      },
-      "type": "symfony-bundle",
-      "extra": {
-        "thanks": {
-          "name": "symfony/webpack-encore",
-          "url": "https://github.com/symfony/webpack-encore"
-        }
-      },
-      "autoload": {
-        "psr-4": {
-          "Symfony\\WebpackEncoreBundle\\": "src"
-        }
-      },
-      "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
-      "authors": [
-        {
-          "name": "Symfony Community",
-          "homepage": "https://symfony.com/contributors"
-        }
-      ],
-      "description": "Integration with your Symfony app & Webpack Encore!",
-      "support": {
-        "issues": "https://github.com/symfony/webpack-encore-bundle/issues",
-        "source": "https://github.com/symfony/webpack-encore-bundle/tree/v2.1.1"
-      },
-      "funding": [
-        {
-          "url": "https://symfony.com/sponsor",
-          "type": "custom"
-        },
-        {
-          "url": "https://github.com/fabpot",
-          "type": "github"
-        },
-        {
-          "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-          "type": "tidelift"
-        }
-      ],
-      "time": "2023-10-22T18:53:08+00:00"
-    },
-    {
       "name": "symfony/yaml",
       "version": "v7.0.3",
       "source": {
@@ -10359,29 +10154,29 @@
     },
     {
       "name": "symfonycasts/sass-bundle",
-      "version": "v0.5.2",
+      "version": "v0.6.0",
       "source": {
         "type": "git",
         "url": "https://github.com/SymfonyCasts/sass-bundle.git",
-        "reference": "29eef1b0b91c89f191b94b896f776756656a8ab5"
+        "reference": "aa47da8ae43136a21a764eedb1471f2a168359cb"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/SymfonyCasts/sass-bundle/zipball/29eef1b0b91c89f191b94b896f776756656a8ab5",
-        "reference": "29eef1b0b91c89f191b94b896f776756656a8ab5",
+        "url": "https://api.github.com/repos/SymfonyCasts/sass-bundle/zipball/aa47da8ae43136a21a764eedb1471f2a168359cb",
+        "reference": "aa47da8ae43136a21a764eedb1471f2a168359cb",
         "shasum": ""
       },
       "require": {
         "php": ">=8.1",
         "symfony/asset-mapper": "^6.3|^7.0",
         "symfony/console": "^5.4|^6.3|^7.0",
+        "symfony/filesystem": "^5.4|^6.3|^7.0",
         "symfony/http-client": "^5.4|^6.3|^7.0",
         "symfony/process": "^5.4|^6.3|^7.0"
       },
       "require-dev": {
         "matthiasnoback/symfony-config-test": "^5.0",
         "phpstan/phpstan-symfony": "^1.4",
-        "symfony/filesystem": "^6.3|^7.0",
         "symfony/framework-bundle": "^6.3|^7.0",
         "symfony/phpunit-bridge": "^6.3|^7.0"
       },
@@ -10408,9 +10203,9 @@
       ],
       "support": {
         "issues": "https://github.com/SymfonyCasts/sass-bundle/issues",
-        "source": "https://github.com/SymfonyCasts/sass-bundle/tree/v0.5.2"
+        "source": "https://github.com/SymfonyCasts/sass-bundle/tree/v0.6.0"
       },
-      "time": "2024-02-20T11:52:20+00:00"
+      "time": "2024-02-26T10:09:48+00:00"
     },
     {
       "name": "twig/extra-bundle",

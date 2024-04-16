@@ -53,6 +53,7 @@ class User extends OAuthUser
     public function __construct($username = '', array $roles = ['ROLE_USER'])
     {
         parent::__construct($username, $roles);
+        $this->roles = $roles;
         $this->authorizations = new ArrayCollection();
     }
 
@@ -95,6 +96,11 @@ class User extends OAuthUser
     public function getUserIdentifier(): string
     {
         return $this->getUsername();
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->getRoles());
     }
 
     public function getRoles(): array
@@ -206,10 +212,10 @@ class User extends OAuthUser
         return $this;
     }
 
-    public function hasAuthorization(Project $project): bool
+    public function hasAuthorization(string $projectKey): bool
     {
         foreach ($this->getAuthorizations() as $authorization) {
-            if ($authorization->getProject()->getId() === $project->getId()) {
+            if ($authorization->getProject()->getKey() === $projectKey) {
                 return true;
             }
         }
@@ -223,11 +229,6 @@ class User extends OAuthUser
     public function getAuthorizations(): Collection
     {
         return $this->authorizations;
-    }
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
     }
 
     public function getAuthorizationProjects(): array
@@ -251,6 +252,11 @@ class User extends OAuthUser
             'username' => $this->username,
             'data'     => $authorization->getData() ?? [],
         ];
+    }
+
+    public function getId(): ?Uuid
+    {
+        return $this->id;
     }
 
     public function equal(User $user): bool

@@ -4,11 +4,10 @@ namespace App\Controller\Oauth;
 
 use App\Entity\User;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GoogleController extends OauthController
 {
@@ -23,10 +22,6 @@ class GoogleController extends OauthController
         Request $request, ClientRegistry $clientRegistry, #[CurrentUser] ?User $user
     ): RedirectResponse {
         $callback = $request->query->get('callback');
-
-        if(!$callback) {
-            $callback = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        }
 
         // If already logged
         if ($user && !$user->isExpired()) {
@@ -51,9 +46,14 @@ class GoogleController extends OauthController
      * in config/packages/knpu_oauth2_client.yaml
      */
     #[Route('/logged/google', name: GoogleController::ROUTE_LOGGED)]
-    public function loggedAction(#[CurrentUser] User $user, Request $request, ClientRegistry $clientRegistry)
-    : RedirectResponse
-    {
-        return $this->redirectLogged($user, $request->query->get('state'));
+    public function loggedAction(#[CurrentUser] User $user, Request $request, ClientRegistry $clientRegistry
+    ) {
+        $state = $request->query->get('state');
+        return $this->redirectLogged(
+            $user,
+            preg_match('/^(\w+)$/i', $state)
+                ? null
+                : $state
+        );
     }
 }

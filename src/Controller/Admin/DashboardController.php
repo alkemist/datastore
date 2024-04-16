@@ -86,28 +86,27 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Access');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Keys', 'fas fa-user', WebauthnCredential::class);
+        yield MenuItem::linkToCrud('Projects', 'fas fa-folder', Project::class);
         yield MenuItem::linkToCrud('Authorizations', 'fas fa-door-open', Authorization::class);
 
-
-        yield MenuItem::section('Datastores');
-        yield MenuItem::linkToCrud('Projects', 'fas fa-folder', Project::class);
-
         foreach ($this->projectRepository->findAll() as $project) {
-            yield MenuItem::section($project->getName());
+            if (count($project->getStores()) > 0) {
+                yield MenuItem::section($project->getName());
 
-            yield MenuItem::linkToCrud(
-                'Stores', 'fa fa-sitemap', Store::class
-            )
-                ->setQueryParameter('filters[project][comparison]', '=')
-                ->setQueryParameter('filters[project][value]', $project->getId());
-
-            foreach ($this->storeRepository->findByProject($project) as $store) {
                 yield MenuItem::linkToCrud(
-                    $store->getName(), 'fas fa-list', Item::class
+                    'Stores', 'fa fa-sitemap', Store::class
                 )
-                    ->setQueryParameter('filters[store][comparison]', '=')
-                    ->setQueryParameter('filters[store][value]', $store->getId());
+                    ->setQueryParameter('filters[project][comparison]', '=')
+                    ->setQueryParameter('filters[project][value]', $project->getId());
 
+                foreach ($this->storeRepository->findByProject($project) as $store) {
+                    yield MenuItem::linkToCrud(
+                        $store->getName(), 'fas fa-list', Item::class
+                    )
+                        ->setQueryParameter('filters[store][comparison]', '=')
+                        ->setQueryParameter('filters[store][value]', $store->getId());
+
+                }
             }
         }
     }

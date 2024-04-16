@@ -13,6 +13,12 @@ class IndexController extends AbstractController
     #[Route(path: '/', name: 'index')]
     public function index(#[CurrentUser] ?User $user): Response
     {
-        return $this->render('page/index.html.twig', []);
+        if ($user && $user->isAdmin()) {
+            return $this->redirectToRoute('admin');
+        }
+
+        return $this->render('page/index.html.twig', [
+            'user' => $user
+        ]);
     }
 }

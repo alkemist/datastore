@@ -58,7 +58,7 @@
     "symfony/validator": "7.0.*",
     "symfony/web-link": "7.0.*",
     "symfony/yaml": "*",
-    "symfonycasts/sass-bundle": "^0.5.1",
+    "symfonycasts/sass-bundle": "^0.6.0",
     "twig/extra-bundle": "^2.12|^3.0",
     "twig/intl-extra": "^3.4",
     "twig/twig": "^2.12|^3.5",
@@ -97,7 +97,7 @@
     "symfony/polyfill-php80": "*"
   },
   "scripts": {
-    "deploy": "git pull; php bin/console do:sc:up --force --complete; composer install",
+    "deploy": "git pull; composer install; php bin/console do:sc:up --force --complete; php bin/console importmap:install; php bin/console asset-map:compile;",
     "rector": "vendor/bin/rector process",
     "crud": "bin/console make:admin:crud",
     "auto-scripts": {

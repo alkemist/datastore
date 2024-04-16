@@ -46,20 +46,12 @@ security:
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
-    - { path: ^/admin, roles: [ IS_AUTHENTICATED_FULLY, ROLE_ADMIN ], requires_channel: 'https' }
+    - { path: ^/admin, roles: [ ROLE_ADMIN ], requires_channel: 'https' }
     - { path: ^/api/public, roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
     - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ], requires_channel: 'https' }
     - { path: ^/logged, roles: [ IS_AUTHENTICATED_FULLY ], requires_channel: 'https' }
     - { path: ^/login,  roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
     - { path: ^/, roles: [ PUBLIC_ACCESS ], requires_channel: 'https' }
-
-when@dev:
-  security:
-    firewalls:
-      app:
-        webauthn:
-          secured_rp_ids:
-            - 'localhost'
 
 when@test:
   security:

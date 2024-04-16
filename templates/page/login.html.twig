@@ -6,8 +6,15 @@
 
 {%- endblock -%}
 
+{%- block javascripts -%}
+    {{ importmap() }}
+{%- endblock -%}
+
+{%- block stylesheets -%}
+    <link rel="stylesheet" href="{{ asset('styles/login.scss') }}">
+{%- endblock -%}
+
 {% block body %}
-    <a href="{{ path('login_google', {callback : googleCallback}) }}">Google</a>
     <form
             {{ stimulus_controller('@web-auth/webauthn-stimulus',
                 {
@@ -17,7 +24,8 @@
                 }
             ) }}
     >
-        <button
+        <a class="action-button" href="{{ path('login_google', {callback : googleCallback}) }}">Google</a>
+        <button class="action-button"
                 type="submit"
                 {{ stimulus_action('@web-auth/webauthn-stimulus', 'signin') }}
         >
