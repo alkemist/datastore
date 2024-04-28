@@ -129,7 +129,7 @@ class User extends OAuthUser
 
     public function isExpired(): bool
     {
-        return !$this->getToken() || $this->getTokenExpires() < time();
+        return !$this->getToken() || !$this->getTokenExpires() || $this->getTokenExpires() < time();
     }
 
     public function getToken(): ?string

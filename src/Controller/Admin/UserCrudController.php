@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
@@ -38,6 +39,7 @@ class UserCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
+            ->add(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
             ->remove(Crud::PAGE_INDEX, Action::DELETE);
     }
 
@@ -72,8 +74,11 @@ class UserCrudController extends AbstractCrudController
             yield TextField::new('googleRefreshToken')
                 ->setColumns(12);
 
+            yield NumberField::new('tokenExpires')
+                ->setColumns(4);
+
             yield TextField::new('token')
-                ->setColumns(12);
+                ->setColumns(8);
 
             yield CollectionField::new('authorizations')
                 ->setColumns(12)

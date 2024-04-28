@@ -22,7 +22,7 @@ class UserController extends OauthController
         $user = $security->getUser();
 
 
-        if ($user) {
+        if ($user && !$user->isExpired()) {
             return $this->redirectLogged($user, $callback);
         }
 

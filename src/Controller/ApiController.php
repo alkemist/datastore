@@ -32,7 +32,7 @@ class ApiController extends AbstractController
     #[Route(path: '/api/profile/{project_key}', name: 'api_profile', methods: ['GET'])]
     public function profile(#[CurrentUser] User $user, string $project_key): Response
     {
-        $response = $this->buildResponse($user);
+
         $project = $this->projectRepository->findOneByKey($project_key);
 
         return $this->buildResponse($user)

@@ -69,7 +69,7 @@ class OauthService
     {
         if ($user->isExpired()) {
             $client = $this->clientRegistry->getClient('google_main');
-            $accessToken = $client->refreshAccessToken($user->getGoogleRefreshToken());
+            $accessToken = $client->refreshAccessToken($user->getGoogleRefreshToken() ?? '');
 
             $user->updateToken();
             $user->setGoogleRefreshToken($accessToken->getToken());

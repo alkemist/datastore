@@ -8,6 +8,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
@@ -24,7 +25,8 @@ class ApiAuthenticator extends AbstractAuthenticator
     private OauthService $oauthService;
 
     public function __construct(
-        OauthService $oauthService,
+        OauthService                           $oauthService,
+        private readonly TokenStorageInterface $tokenStorage
     ) {
         $this->oauthService = $oauthService;
     }
@@ -100,6 +102,8 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        $this->tokenStorage->setToken(null);
+
         if ($request->attributes->get('_route') === 'api_profile' && $exception->getCode() !== 403) {
             return (new ApiResponse())
                 ->setResponse(
