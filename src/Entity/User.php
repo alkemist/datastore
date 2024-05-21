@@ -17,6 +17,8 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Table(name: '`user`')]
 class User extends OAuthUser
 {
+    const MAX_AGE = 3600 * 24;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -267,7 +269,7 @@ class User extends OAuthUser
     public function updateToken(): static
     {
         $this->token = Uuid::v7()->jsonSerialize();
-        $this->tokenExpires = time() + 3600;
+        $this->tokenExpires = time() + self::MAX_AGE;
 
         return $this;
     }
