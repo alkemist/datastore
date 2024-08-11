@@ -22,13 +22,15 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
     public function __construct(
         private OauthService   $oauthService,
         private ClientRegistry $clientRegistry,
-    ) {
+    )
+    {
     }
 
     public function supports(Request $request): ?bool
     {
         // continue ONLY if the current ROUTE matches the check ROUTE
-        return $request->attributes->get('_route') === GoogleController::ROUTE_LOGGED;
+        return
+            $request->attributes->get('_route') === GoogleController::ROUTE_LOGGED;
     }
 
     public function authenticate(Request $request): Passport
@@ -37,8 +39,8 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         $accessToken = $this->fetchAccessToken($client);
 
         return new SelfValidatingPassport(
-            new UserBadge($accessToken->getToken(), function () use ($accessToken, $client) {
-                return $this->oauthService->registerUser($client, $accessToken);
+            new UserBadge($accessToken->getToken(), function () use ($accessToken, $client, $request) {
+                return $this->oauthService->registerUser($client, $accessToken, $request);
             })
         );
     }

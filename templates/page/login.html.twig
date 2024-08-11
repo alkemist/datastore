@@ -24,7 +24,8 @@
                 }
             ) }}
     >
-        <a class="action-button" href="{{ path('login_google', {callback : googleCallback}) }}">Google</a>
+        <a class="action-button"
+           href="{{ path('login_google', {callback : googleCallback, project_key : projectKey}) }}">Google</a>
         <button class="action-button"
                 type="submit"
                 {{ stimulus_action('@web-auth/webauthn-stimulus', 'signin') }}

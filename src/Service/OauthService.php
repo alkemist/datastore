@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Security\ApiAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
@@ -11,6 +12,7 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use League\OAuth2\Client\Provider\GoogleUser;
 use League\OAuth2\Client\Token\AccessToken;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class OauthService
@@ -20,13 +22,14 @@ class OauthService
         private ClientRegistry         $clientRegistry,
         private EntityManagerInterface $entityManager,
         private UserRepository         $userRepository,
-    ) {
+    )
+    {
     }
 
     /**
      * @throws Exception
      */
-    function registerUser(OAuth2ClientInterface $client, AccessToken $accessToken): User
+    function registerUser(OAuth2ClientInterface $client, AccessToken $accessToken, Request $request): User
     {
         /** @var GoogleUser $googleUser */
         $googleUser = $client->fetchUserFromToken($accessToken);
@@ -54,7 +57,12 @@ class OauthService
             $user->setRoles(['ROLE_ADMIN']);
         }
 
+        $apiProject = ApiAuthenticator::getProjectByRequest($request);
+
+        ApiAuthenticator::checkAuthorization($user, $apiProject);
+
         $user->updateToken();
+        $user->getCurrentAuth()->updateToken();
         $user->setGoogleId($googleUser->getId());
         $user->setGoogleRefreshToken($refreshToken);
         $user->setGoogleExpires($expires);
@@ -65,13 +73,17 @@ class OauthService
         return $user;
     }
 
+    /**
+     * @throws Exception
+     */
     function refreshUser(User $user)
     {
-        if ($user->isExpired()) {
+        if ($user->getCurrentAuth()->isExpired()) {
             $client = $this->clientRegistry->getClient('google_main');
             $accessToken = $client->refreshAccessToken($user->getGoogleRefreshToken() ?? '');
 
             $user->updateToken();
+            $user->getCurrentAuth()->updateToken();
             $user->setGoogleRefreshToken($accessToken->getToken());
             $user->setGoogleExpires($accessToken->getExpires());
             $this->entityManager->flush();
@@ -80,11 +92,14 @@ class OauthService
         return $user;
     }
 
+    /**
+     * @throws Exception
+     */
     public function clear(User $user): void
     {
         $user->setGoogleRefreshToken(null);
         $user->setGoogleExpires(null);
-        $user->setTokenExpires(null);
+        $user->getCurrentAuth()->setTokenExpires(null);
         $this->entityManager->flush();
     }
 

@@ -19,7 +19,8 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository         $userRepository
-    ) {
+    )
+    {
     }
 
     /**
@@ -29,8 +30,8 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
     {
         /** @var User|null $user */
         $user = $this->userRepository->findOneBy([
-                                                     'username' => $username,
-                                                 ]);
+            'username' => $username,
+        ]);
 
         return $this->getUserEntity($user);
     }
@@ -38,6 +39,7 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
     /**
      * Converts a Symfony User (if any) into a Webauthn User Entity
      * @throws InvalidDataException
+     * @throws \Exception
      */
     public function getUserEntity(null|User $user): ?PublicKeyCredentialUserEntity
     {
@@ -46,6 +48,7 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
         }
 
         $user->updateToken();
+        $user->getCurrentAuth()->updateToken();
         $this->entityManager->flush();
 
         return new PublicKeyCredentialUserEntity(
@@ -63,8 +66,8 @@ final class WebauthnUserEntityRepository implements PublicKeyCredentialUserEntit
     {
         /** @var User|null $user */
         $user = $this->userRepository->findOneBy([
-                                                     'email' => $userHandle,
-                                                 ]);
+            'email' => $userHandle,
+        ]);
 
         return $this->getUserEntity($user);
     }

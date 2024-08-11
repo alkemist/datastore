@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Authorization;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,18 @@ class AuthorizationRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Authorization::class);
+    }
+
+    public function findOneByProjectAndToken(string $project_key, string $token): ?User
+    {
+        return $this->createQueryBuilder('a')
+            ->join('a.project', 'p')
+            ->andWhere('p.key = :project')
+            ->andWhere('a.token = :token')
+            ->setParameter('project', $project_key)
+            ->setParameter('token', $token)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**

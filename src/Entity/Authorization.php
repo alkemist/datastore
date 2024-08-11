@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
+use App\Model\TokenInterface;
 use App\Repository\AuthorizationRepository;
+use App\Trait\TokenTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AuthorizationRepository::class)]
 #[ORM\Table(name: '`authorization`')]
-class Authorization
+class Authorization extends TokenInterface
 {
+    use TokenTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -24,6 +28,12 @@ class Authorization
 
     #[ORM\Column(nullable: true)]
     private ?array $data = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $token = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $tokenExpires = null;
 
     public function __toString(): string
     {

@@ -16,9 +16,12 @@ class ApiResponse extends ArrayObject
         parent::__construct($array, ArrayObject::ARRAY_AS_PROPS);
     }
 
+    /**
+     * @throws \Exception
+     */
     function setToken(User $user): static
     {
-        $this->offsetSet('token', $user->getToken());
+        $this->offsetSet('token', $user->getCurrentAuth()->getToken());
         return $this;
     }
 

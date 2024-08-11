@@ -2,23 +2,21 @@
 
 namespace App\Entity;
 
+use App\Model\TokenInterface;
+use App\Model\UserToken;
 use App\Repository\UserRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use KnpU\OAuth2ClientBundle\Security\User\OAuthUser;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User extends OAuthUser
+class User extends UserToken
 {
-    const MAX_AGE = 3600 * 24;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -45,12 +43,7 @@ class User extends OAuthUser
 
     #[ORM\OneToMany(mappedBy: 'member', targetEntity: Authorization::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $authorizations;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $token = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $tokenExpires = null;
+    private Authorization|null $currentAuth = null;
 
     public function __construct($username = '', array $roles = ['ROLE_USER'])
     {
@@ -134,30 +127,6 @@ class User extends OAuthUser
         return !$this->getToken() || !$this->getTokenExpires() || $this->getTokenExpires() < time();
     }
 
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-    public function setToken($token = ''): static
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
-    public function getTokenExpires(): ?int
-    {
-        return $this->tokenExpires;
-    }
-
-    public function setTokenExpires(?int $tokenExpires): static
-    {
-        $this->tokenExpires = $tokenExpires;
-
-        return $this;
-    }
-
     public function getGoogleRefreshToken(): ?string
     {
         return $this->googleRefreshToken;
@@ -182,16 +151,6 @@ class User extends OAuthUser
         return $this;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getTokenExpiresDiffDate(): ?DateTime
-    {
-        return $this->tokenExpires > time()
-            ? DateTime::createFromFormat('U', $this->tokenExpires - time())
-            : null;
-    }
-
     public function addAuthorization(Authorization $authorization): static
     {
         if (!$this->authorizations->contains($authorization)) {
@@ -214,11 +173,14 @@ class User extends OAuthUser
         return $this;
     }
 
-    public function hasAuthorization(string $projectKey): bool
+    public function hasProjectAuthorization(string|null $projectKey): bool
     {
-        foreach ($this->getAuthorizations() as $authorization) {
-            if ($authorization->getProject()->getKey() === $projectKey) {
-                return true;
+        if ($projectKey) {
+            foreach ($this->getAuthorizations() as $authorization) {
+                if ($authorization->getProject()->getKey() === $projectKey) {
+                    $this->setCurrentAuth($authorization);
+                    return true;
+                }
             }
         }
 
@@ -231,6 +193,11 @@ class User extends OAuthUser
     public function getAuthorizations(): Collection
     {
         return $this->authorizations;
+    }
+
+    private function setCurrentAuth(Authorization $authorization): void
+    {
+        $this->currentAuth = $authorization;
     }
 
     public function getAuthorizationProjects(): array
@@ -249,10 +216,10 @@ class User extends OAuthUser
         );
 
         return [
-            'id'       => $this->id,
-            'email'    => $this->email,
+            'id' => $this->id,
+            'email' => $this->email,
             'username' => $this->username,
-            'data'     => $authorization->getData() ?? [],
+            'data' => $authorization->getData() ?? [],
         ];
     }
 
@@ -266,11 +233,15 @@ class User extends OAuthUser
         return $this->getId()->equals($user->getId());
     }
 
-    public function updateToken(): static
+    /**
+     * @throws Exception
+     */
+    function getCurrentAuth(): TokenInterface|UserToken
     {
-        $this->token = Uuid::v7()->jsonSerialize();
-        $this->tokenExpires = time() + self::MAX_AGE;
+        if (!$this->currentAuth) {
+            return $this;
+        }
 
-        return $this;
+        return $this->currentAuth;
     }
 }

@@ -2,6 +2,7 @@
 // src/Security/ApiKeyAuthenticator.php
 namespace App\Security;
 
+use App\Entity\User;
 use App\Model\ApiResponse;
 use App\Service\OauthService;
 use Doctrine\ORM\NonUniqueResultException;
@@ -19,16 +20,34 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
-    private const TOKEN_HEADER_KEY = 'X-AUTH-TOKEN';
-    private const PROJECT_HEADER_KEY = 'X-AUTH-PROJECT';
+    public const TOKEN_HEADER_KEY = 'X-AUTH-TOKEN';
+    public const PROJECT_HEADER_KEY = 'X-AUTH-PROJECT';
+    public const PROJECT_QUERY_KEY = 'project_key';
 
     private OauthService $oauthService;
 
     public function __construct(
         OauthService                           $oauthService,
         private readonly TokenStorageInterface $tokenStorage
-    ) {
+    )
+    {
         $this->oauthService = $oauthService;
+    }
+
+    static function buildCallback($callback, $projectKey, $code = ''): string
+    {
+        $callback .= "?" . self::PROJECT_QUERY_KEY . "=$projectKey";
+
+        if ($code) $callback .= "&code=$code";
+
+        return $callback;
+    }
+
+    public static function getProjectByRequest(Request $request): string
+    {
+        $state = $request->query->get('state');
+        preg_match('@https?://(.*)/authorize/?(\w+)\?' . self::PROJECT_QUERY_KEY . '=([\w\-]+)@i', $state, $m);
+        return count($m) === 4 ? $m[3] : '';
     }
 
     /**
@@ -67,13 +86,7 @@ class ApiAuthenticator extends AbstractAuthenticator
             );
         }
 
-        if (!$user->hasAuthorization($apiProject)) {
-            throw new CustomUserMessageAuthenticationException(
-                "Unauthorized project",
-                [],
-                403
-            );
-        }
+        self::checkAuthorization($user, $apiProject);
 
         try {
             $this->oauthService->refreshUser($user);
@@ -93,6 +106,25 @@ class ApiAuthenticator extends AbstractAuthenticator
                 }
             )
         );
+    }
+
+    static function checkAuthorization(User $user, string|null $apiProject): void
+    {
+        if (!$apiProject && !$user->isAdmin()) {
+            throw new CustomUserMessageAuthenticationException(
+                "Empty project",
+                [],
+                403
+            );
+        }
+
+        if (!$user->hasProjectAuthorization($apiProject) && !$user->isAdmin()) {
+            throw new CustomUserMessageAuthenticationException(
+                "Unauthorized project",
+                [],
+                403
+            );
+        }
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

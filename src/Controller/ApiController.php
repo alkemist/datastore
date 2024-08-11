@@ -10,6 +10,7 @@ use App\Model\ApiResponse;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\StoreRepository;
+use App\Security\ApiAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Util\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,13 +27,13 @@ class ApiController extends AbstractController
         private readonly ProjectRepository      $projectRepository,
         private readonly StoreRepository        $storeRepository,
         private readonly ItemRepository         $itemRepository,
-    ) {
+    )
+    {
     }
 
     #[Route(path: '/api/profile/{project_key}', name: 'api_profile', methods: ['GET'])]
     public function profile(#[CurrentUser] User $user, string $project_key): Response
     {
-
         $project = $this->projectRepository->findOneByKey($project_key);
 
         return $this->buildResponse($user)
@@ -40,9 +41,29 @@ class ApiController extends AbstractController
             ->toJson();
     }
 
+    /**
+     * @throws \Exception
+     */
     private function buildResponse(User $user): ApiResponse
     {
         return (new ApiResponse())->setToken($user);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route(path: '/api/logout/{project_key}', name: 'api_logout', methods: ['GET'])]
+    public function logout(#[CurrentUser] User $user, string $project_key): Response
+    {
+        ApiAuthenticator::checkAuthorization($user, $project_key);
+        $response = $this->buildResponse($user)
+            ->toJson();
+
+        $user->getCurrentAuth()->setToken('');
+        $user->getCurrentAuth()->setTokenExpires(null);
+        $this->entityManager->flush();
+
+        return $response;
     }
 
     /**
@@ -53,7 +74,8 @@ class ApiController extends AbstractController
         #[CurrentUser] User $user,
         string              $project_key,
         string              $store_key
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {
@@ -100,7 +122,8 @@ class ApiController extends AbstractController
     public function public_items(
         string $project_key,
         string $store_key
-    ): Response {
+    ): Response
+    {
         $response = new ApiResponse();
 
         try {
@@ -137,7 +160,8 @@ class ApiController extends AbstractController
         Request             $request,
         string              $project_key,
         string              $store_key
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {
@@ -178,7 +202,8 @@ class ApiController extends AbstractController
         Request             $request,
         string              $project_key,
         string              $store_key
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {
@@ -221,7 +246,8 @@ class ApiController extends AbstractController
         string              $project_key,
         string              $store_key,
         string              $slug
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {
@@ -254,7 +280,8 @@ class ApiController extends AbstractController
         string $project_key,
         string $store_key,
         string $slug
-    ): Response {
+    ): Response
+    {
         $response = new ApiResponse();
 
         try {
@@ -290,7 +317,8 @@ class ApiController extends AbstractController
     #[Route('/api/store/{project_key}/{store_key}/exist', name: 'api_exist_create_item', methods: ['PUT'])]
     public function exist_create(
         #[CurrentUser] User $user, Request $request, string $project_key, string $store_key
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {
@@ -316,7 +344,8 @@ class ApiController extends AbstractController
     #[Route('/api/item/{id}/exist', name: 'api_exist_update_item', methods: ['POST'])]
     public function exist_update(
         #[CurrentUser] User $user, Request $request, Uuid $id
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         $item = $this->itemRepository->find($id);
@@ -343,7 +372,8 @@ class ApiController extends AbstractController
     #[Route('/api/store/{project_key}/{store_key}', name: 'api_put_item', methods: ['PUT'])]
     public function create(
         #[CurrentUser] User $user, Request $request, string $project_key, string $store_key
-    ): Response {
+    ): Response
+    {
         $response = $this->buildResponse($user);
 
         try {

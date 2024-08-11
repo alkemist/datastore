@@ -9,6 +9,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
 class AuthorizationCrudController extends AbstractCrudController
 {
@@ -45,7 +48,18 @@ class AuthorizationCrudController extends AbstractCrudController
         yield AssociationField::new('member')
             ->setColumns(6);
 
+        if (Crud::PAGE_INDEX === $pageName) {
+            yield TimeField::new('tokenExpiresDiffDate')
+                ->setLabel('Token expire');
+        }
+
         if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_DETAIL === $pageName) {
+            yield NumberField::new('tokenExpires')
+                ->setColumns(4);
+
+            yield TextField::new('token')
+                ->setColumns(8);
+
             yield CodeEditorField::new('data')
                 ->setFormType(JsonCodeEditorType::class)
                 ->setColumns(12);

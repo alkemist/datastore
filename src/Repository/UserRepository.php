@@ -31,7 +31,7 @@ class UserRepository extends ServiceEntityRepository
             ->join('u.authorizations', 'a')
             ->join('a.project', 'p')
             ->andWhere('p.key = :project')
-            ->andWhere('u.token = :token')
+            ->andWhere('a.token = :token')
             ->setParameter('project', $project_key)
             ->setParameter('token', $token)
             ->getQuery()
@@ -44,7 +44,8 @@ class UserRepository extends ServiceEntityRepository
     public function findOneByToken(string $token): ?User
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.token = :token')
+            ->join('u.authorizations', 'a')
+            ->andWhere('a.token = :token')
             ->setParameter('token', $token)
             ->getQuery()
             ->getOneOrNullResult();
